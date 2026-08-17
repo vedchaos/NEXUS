@@ -70,7 +70,7 @@
     },
     "nexus-orchestrator": {
       "type": "local",
-      "command": ["python", "mcp_servers/m4st_agent_mcp.py"],
+      "command": ["python", "mcp_servers/nexus_orchestrator_mcp.py"],
       "enabled": true
     }
   },
