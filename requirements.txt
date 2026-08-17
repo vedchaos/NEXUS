@@ -1,0 +1,32 @@
+# NEXUS Python Dependencies
+# Install: pip install -r requirements.txt
+
+# === Core ===
+chromadb>=0.4.0
+requests>=2.31.0
+
+# === Voice & Vision ===
+openai-whisper>=20231117
+pytesseract>=0.3.10
+Pillow>=10.0.0
+pyautogui>=0.9.54
+sounddevice>=0.4.6
+scipy>=1.11.0
+numpy>=1.24.0
+
+# === ML ===
+torch>=2.0.0
+torchvision>=0.15.0
+transformers>=4.35.0
+datasets>=2.14.0
+accelerate>=0.24.0
+scikit-learn>=1.3.0
+pandas>=2.1.0
+matplotlib>=3.7.0
+
+# === Scheduling ===
+schedule>=1.2.0
+APScheduler>=3.10.0
+
+# === Utilities ===
+python-dotenv>=1.0.0

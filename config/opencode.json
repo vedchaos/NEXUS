@@ -1,0 +1,101 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "username": "nexus-operator",
+  "model": "ollama/llama3.1",
+  "small_model": "ollama/llama3.1:8b",
+  "default_agent": "nexus",
+  "shell": "powershell",
+  "logLevel": "INFO",
+  "share": "manual",
+  "autoupdate": false,
+
+  "skills": {
+    "paths": [".opencode/skills"]
+  },
+
+  "agent": {
+    "nexus": {
+      "description": "NEXUS primary agent — autonomous AI OS with 3-tier memory, multi-provider LLM, security scanning, ML pipeline, voice/vision.",
+      "mode": "primary",
+      "model": "ollama/llama3.1",
+      "color": "red"
+    },
+    "nexus-recon": {
+      "description": "Reconnaissance subagent. Passive + active recon, OSINT, subdomain enumeration.",
+      "mode": "subagent",
+      "model": "ollama/llama3.1"
+    },
+    "nexus-scan": {
+      "description": "Vulnerability scanning subagent. Nmap, Nuclei, Nikto, Gobuster.",
+      "mode": "subagent",
+      "model": "ollama/llama3.1"
+    },
+    "nexus-exploit": {
+      "description": "Exploitation subagent. SQLMap, Hydra, Metasploit. AUTHORIZATION REQUIRED.",
+      "mode": "subagent",
+      "model": "ollama/llama3.1"
+    },
+    "nexus-ml": {
+      "description": "ML development subagent. Training, evaluation, deployment pipelines.",
+      "mode": "subagent",
+      "model": "ollama/llama3.1"
+    },
+    "nexus-code": {
+      "description": "Code review and development subagent.",
+      "mode": "subagent",
+      "model": "ollama/llama3.1"
+    }
+  },
+
+  "mcp": {
+    "nexus-brain": {
+      "type": "local",
+      "command": ["python", "mcp_servers/llm_fallback.py"],
+      "enabled": true
+    },
+    "nexus-memory": {
+      "type": "local",
+      "command": ["python", "mcp_servers/memory_mcp.py"],
+      "enabled": true
+    },
+    "nexus-router": {
+      "type": "local",
+      "command": ["python", "mcp_servers/task_router_mcp.py"],
+      "enabled": true
+    },
+    "nexus-security": {
+      "type": "local",
+      "command": ["python", "mcp_servers/pentest_mcp.py"],
+      "enabled": true
+    },
+    "nexus-orchestrator": {
+      "type": "local",
+      "command": ["python", "mcp_servers/m4st_agent_mcp.py"],
+      "enabled": true
+    }
+  },
+
+  "plugin": [
+    "./.opencode/plugins/nexus-memory.ts",
+    "./.opencode/plugins/nexus-security.ts"
+  ],
+
+  "permission": {
+    "edit": "allow",
+    "bash": {
+      "python *": "allow",
+      "pip *": "allow",
+      "ollama *": "allow",
+      "nmap *": "ask",
+      "nuclei *": "ask",
+      "nikto *": "ask",
+      "gobuster *": "ask",
+      "sqlmap *": "ask",
+      "hydra *": "ask",
+      "git *": "allow",
+      "curl *": "allow",
+      "wsl *": "ask",
+      "*": "ask"
+    }
+  }
+}
