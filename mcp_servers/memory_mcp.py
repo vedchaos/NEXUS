@@ -8,8 +8,8 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "bridge_core"))
-from memory_3tier import get_memory
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from bridge_core.memory_3tier import get_memory
 
 
 def handle_request(request):

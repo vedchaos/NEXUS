@@ -8,8 +8,8 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "bridge_core"))
-from smart_brain import get_brain
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from bridge_core.smart_brain import get_brain
 
 
 def handle_request(request):

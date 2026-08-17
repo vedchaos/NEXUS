@@ -13,8 +13,8 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "bridge_core"))
-from agents import get_orchestrator
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from bridge_core.agents import get_orchestrator
 
 # === MCP Protocol ===
 PROTOCOL_VERSION = "2024-11-05"

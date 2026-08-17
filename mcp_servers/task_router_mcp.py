@@ -8,8 +8,8 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "bridge_core"))
-from task_classifier import classify_task, get_task_chain
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from bridge_core.task_classifier import classify_task, get_task_chain
 
 
 def handle_request(request):
@@ -78,7 +78,7 @@ def handle_request(request):
             }}
 
         elif tool_name == "list_task_types":
-            from task_classifier import TASK_TYPES
+            from bridge_core.task_classifier import TASK_TYPES
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(list(TASK_TYPES.keys()), indent=2)}],
             }}
