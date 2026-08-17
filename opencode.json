@@ -8,6 +8,7 @@
   "logLevel": "INFO",
   "share": "manual",
   "autoupdate": false,
+  "instructions": ["SOUL_NEXUS.md"],
 
   "skills": {
     "paths": [".opencode/skills"]
