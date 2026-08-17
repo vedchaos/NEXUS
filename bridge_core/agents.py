@@ -12,8 +12,8 @@ from pathlib import Path
 # Import NEXUS modules
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
-from smart_brain import get_brain
-from memory_3tier import get_memory
+from .smart_brain import get_brain
+from .memory_3tier import get_memory
 
 
 class Agent:

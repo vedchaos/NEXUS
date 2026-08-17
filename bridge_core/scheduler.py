@@ -16,9 +16,11 @@ CONFIG_FILE = SCHEDULE_DIR / "schedule_config.json"
 # === Hinglish Time Parser ===
 HINGLISH_PATTERNS = {
     # Minutes
+    r"agle\s+(\d+)\s*minute": lambda m: timedelta(minutes=int(m.group(1))),
     r"(\d+)\s*minute\s*baad": lambda m: timedelta(minutes=int(m.group(1))),
     r"(\d+)\s*min\s*baad": lambda m: timedelta(minutes=int(m.group(1))),
     r"(\d+)\s*min\b": lambda m: timedelta(minutes=int(m.group(1))),
+    r"(\d+)\s*minute": lambda m: timedelta(minutes=int(m.group(1))),
     # Hours
     r"(\d+)\s*ghante?\s*baad": lambda m: timedelta(hours=int(m.group(1))),
     r"(\d+)\s*hour\s*baad": lambda m: timedelta(hours=int(m.group(1))),
@@ -28,7 +30,9 @@ HINGLISH_PATTERNS = {
     r"(\d+)\s*day\s*baad": lambda m: timedelta(days=int(m.group(1))),
     r"(\d+)\s*days?": lambda m: timedelta(days=int(m.group(1))),
     # Specific times
-    r"kal\s*(\d{1,2})": lambda m: timedelta(days=1),  # kal 2 baje
+    r"kal\s+\w*\s*(\d{1,2})": lambda m: timedelta(days=1),  # kal subah 9 AM, kal raat 10
+    r"kal\s+(\d{1,2})": lambda m: timedelta(days=1),  # kal 10 baje
+    r"aaj\s*raat\s*(\d{1,2})": lambda m: timedelta(hours=max(0, int(m.group(1)) - datetime.now().hour)),
     r"aaj\s*raat": lambda m: timedelta(hours=12),
     r"abhi": lambda m: timedelta(seconds=0),
     r"turant": lambda m: timedelta(seconds=0),

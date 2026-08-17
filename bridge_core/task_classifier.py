@@ -124,7 +124,7 @@ def classify_task(user_input: str) -> Tuple[str, float]:
 
 def get_task_chain(task_type: str) -> dict:
     """Get the recommended provider chain for a task type"""
-    from smart_brain import TASK_CHAINS
+    from .smart_brain import TASK_CHAINS
     return TASK_CHAINS.get(task_type, TASK_CHAINS["agent"])
 
 
