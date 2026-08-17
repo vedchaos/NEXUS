@@ -63,7 +63,7 @@ NEXUS/
 │   ├── memory_mcp.py           ← Memory MCP
 │   ├── task_router_mcp.py      ← Router MCP
 │   ├── pentest_mcp.py          ← Security MCP
-│   └── m4st_agent_mcp.py       ← Orchestrator MCP
+│   └── nexus_orchestrator_mcp.py  ← Orchestrator MCP
 ├── .opencode/                    ← OpenCode integration
 │   ├── agents/                  ← Agent definitions
 │   ├── skills/                  ← Skill modules
