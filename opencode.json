@@ -18,7 +18,7 @@
       "description": "NEXUS primary agent — autonomous AI OS with 3-tier memory, multi-provider LLM, security scanning, ML pipeline, voice/vision.",
       "mode": "primary",
       "model": "ollama/goekdenizguelmez/JOSIEFIED-Qwen3:8b",
-      "color": "red"
+      "color": "error"
     },
     "nexus-recon": {
       "description": "Reconnaissance subagent. Passive + active recon, OSINT, subdomain enumeration.",
