@@ -73,6 +73,21 @@
       "type": "local",
       "command": ["python", "mcp_servers/nexus_orchestrator_mcp.py"],
       "enabled": true
+    },
+    "nexus-voice": {
+      "type": "local",
+      "command": ["python", "mcp_servers/voice_mcp.py"],
+      "enabled": true
+    },
+    "nexus-vision": {
+      "type": "local",
+      "command": ["python", "mcp_servers/vision_mcp.py"],
+      "enabled": true
+    },
+    "nexus-ml": {
+      "type": "local",
+      "command": ["python", "mcp_servers/ml_mcp.py"],
+      "enabled": true
     }
   },
 
