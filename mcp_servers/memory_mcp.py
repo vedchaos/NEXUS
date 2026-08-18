@@ -24,6 +24,9 @@ def handle_request(request):
             "serverInfo": {"name": "nexus-memory", "version": "1.0.0"},
         }}
 
+    if method == "notifications/initialized":
+        return None  # No response for notifications
+
     elif method == "tools/list":
         return {"jsonrpc": "2.0", "id": req_id, "result": {"tools": [
             {

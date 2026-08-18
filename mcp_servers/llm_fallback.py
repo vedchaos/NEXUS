@@ -25,6 +25,9 @@ def handle_request(request):
             "serverInfo": {"name": "nexus-brain", "version": "1.0.0"},
         }}
 
+    if method == "notifications/initialized":
+        return None  # No response for notifications
+
     elif method == "tools/list":
         return {"jsonrpc": "2.0", "id": req_id, "result": {"tools": [
             {
@@ -34,7 +37,8 @@ def handle_request(request):
                     "type": "object",
                     "properties": {
                         "prompt": {"type": "string", "description": "The prompt to send"},
-                        "task_type": {"type": "string", "enum": ["code", "research", "vision", "pentest", "write", "speed", "quality", "cost", "local", "hinglish", "data", "agent"], "description": "Task type for routing"},
+                        "task_type": {"type": "string", "enum": ["code", "research", "vision", "pentest", "write", "speed", "quality", "cost", "local", "hinglish", "data", "agent", "ml"], "description": "Task type for routing"},
+                        "system_prompt": {"type": "string", "description": "Optional system prompt to set context"},
                     },
                     "required": ["prompt"],
                 },
@@ -55,7 +59,8 @@ def handle_request(request):
         if tool_name == "nexus_query":
             prompt = args.get("prompt", "")
             task_type = args.get("task_type", "agent")
-            response, provider, model, cached = brain.query(prompt, task_type)
+            system_prompt = args.get("system_prompt")
+            response, provider, model, cached = brain.query(prompt, task_type, system_prompt=system_prompt)
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": response}],
                 "metadata": {"provider": provider, "model": model, "cached": cached},

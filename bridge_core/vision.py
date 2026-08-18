@@ -42,6 +42,22 @@ class NexusVision:
 
     # === Screenshot ===
 
+    def _cleanup_old_screenshots(self, max_age_days: int = 7):
+        """Delete screenshots older than max_age_days to save disk space."""
+        try:
+            import time as _time
+            cutoff = _time.time() - (max_age_days * 86400)
+            removed = 0
+            if SCREENSHOTS_DIR.exists():
+                for f in SCREENSHOTS_DIR.glob("screen_*.png"):
+                    if f.stat().st_mtime < cutoff:
+                        f.unlink()
+                        removed += 1
+            if removed:
+                print(f"[VISION] Auto-cleaned {removed} old screenshot(s)")
+        except Exception:
+            pass  # non-critical
+
     def take_screenshot(self, region: tuple = None) -> dict:
         """Take screenshot of full screen or region (x, y, w, h)"""
         try:
@@ -59,6 +75,7 @@ class NexusVision:
             else:
                 img = ImageGrab.grab()
             img.save(str(filepath))
+            self._cleanup_old_screenshots()  # auto-cleanup
             return {
                 "status": "captured",
                 "path": str(filepath),

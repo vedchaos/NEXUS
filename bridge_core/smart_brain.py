@@ -19,7 +19,7 @@ PROVIDERS = {
         "prefix": "nvapi-",
         "base_url": "https://integrate.api.nvidia.com/v1",
         "free_tier": True,
-        "rate_limit": 100,  # requests per day
+        "rate_limit": 100,
         "models": ["meta/llama-3.1-8b-instruct", "mistralai/mistral-7b-instruct-v0.3"],
     },
     "groq": {
@@ -79,9 +79,9 @@ PROVIDERS = {
         "models": ["meta-llama/Meta-Llama-3.1-8B-Instruct"],
     },
     "deepseek": {
-        "prefix": "sk-",
+        "prefix": "sk-ds-",  # Changed from "sk-" to avoid OpenAI collision
         "base_url": "https://api.deepseek.com/v1",
-        "free_tier": False,  # cheap but not free
+        "free_tier": False,
         "rate_limit": 500,
         "models": ["deepseek-chat"],
     },
@@ -177,6 +177,11 @@ TASK_CHAINS = {
         "fallback": ["mistral", "sambanova"],
         "model_preference": ["instruct", "8b"],
     },
+    "ml": {
+        "preferred": ["groq", "nvidia", "deepseek"],
+        "fallback": ["ollama", "openrouter"],
+        "model_preference": ["instruct", "8b"],
+    },
 }
 
 
@@ -189,30 +194,41 @@ class LRUCache:
         self.disk_path = disk_path or Path("data/cache/llm_responses.json")
         self.disk_cache = self._load_disk_cache()
         self.stats = {"hits": 0, "misses": 0}
+        self._dirty = False  # Track if disk needs write
 
     def _load_disk_cache(self):
         try:
             if self.disk_path.exists():
                 return json.loads(self.disk_path.read_text())
-        except:
-            pass
+        except (json.JSONDecodeError, OSError) as e:
+            print(f"[WARN] Failed to load disk cache: {e}")
         return {}
 
-    def _save_disk_cache(self):
-        self.disk_path.parent.mkdir(parents=True, exist_ok=True)
-        # Keep only last 1000 entries
-        if len(self.disk_cache) > 1000:
-            sorted_keys = sorted(self.disk_cache.keys(), key=lambda k: self.disk_cache[k].get("time", 0))
-            for k in sorted_keys[:500]:
-                del self.disk_cache[k]
-        self.disk_path.write_text(json.dumps(self.disk_cache, indent=2))
+    def _save_disk_cache(self, force=False):
+        """Save to disk with write coalescing — only write if dirty or forced."""
+        if not force and not self._dirty:
+            return
+        try:
+            self.disk_path.parent.mkdir(parents=True, exist_ok=True)
+            # Keep only last 1000 entries
+            if len(self.disk_cache) > 1000:
+                sorted_keys = sorted(
+                    self.disk_cache.keys(),
+                    key=lambda k: self.disk_cache[k].get("time", 0),
+                )
+                for k in sorted_keys[:500]:
+                    del self.disk_cache[k]
+            self.disk_path.write_text(json.dumps(self.disk_cache, indent=2))
+            self._dirty = False
+        except OSError as e:
+            print(f"[WARN] Failed to save disk cache: {e}")
 
-    def _hash_key(self, query, task_type, model):
-        content = f"{query}|{task_type}|{model}"
-        return hashlib.md5(content.encode()).hexdigest()
+    def _hash_key(self, query, task_type, model, system_prompt=None):
+        content = f"{query}|{task_type}|{model}|{system_prompt or ''}"
+        return hashlib.sha256(content.encode()).hexdigest()[:32]
 
-    def get(self, query, task_type="agent", model="default"):
-        key = self._hash_key(query, task_type, model)
+    def get(self, query, task_type="agent", model="default", system_prompt=None):
+        key = self._hash_key(query, task_type, model, system_prompt)
 
         # L1: RAM
         if key in self.ram_cache:
@@ -225,14 +241,16 @@ class LRUCache:
             entry = self.disk_cache[key]
             # Promote to RAM
             self.ram_cache[key] = entry
+            if len(self.ram_cache) > self.ram_size:
+                self.ram_cache.popitem(last=False)
             self.stats["hits"] += 1
             return entry["response"]
 
         self.stats["misses"] += 1
         return None
 
-    def set(self, query, task_type, model, response):
-        key = self._hash_key(query, task_type, model)
+    def set(self, query, task_type, model, response, system_prompt=None):
+        key = self._hash_key(query, task_type, model, system_prompt)
         entry = {
             "response": response,
             "time": time.time(),
@@ -245,14 +263,19 @@ class LRUCache:
         if len(self.ram_cache) > self.ram_size:
             self.ram_cache.popitem(last=False)
 
-        # Save to disk
+        # Save to disk (lazy)
         self.disk_cache[key] = entry
+        self._dirty = True
         self._save_disk_cache()
+
+    def flush(self):
+        """Force write to disk."""
+        self._save_disk_cache(force=True)
 
     def clear(self):
         self.ram_cache.clear()
         self.disk_cache.clear()
-        self._save_disk_cache()
+        self._save_disk_cache(force=True)
 
 
 class SmartBrain:
@@ -286,8 +309,28 @@ class SmartBrain:
             }
 
     def _detect_provider(self, key_name, key_value):
-        """Auto-detect provider from key prefix"""
+        """Auto-detect provider from key prefix.
+        
+        Order matters: more specific prefixes must be checked first.
+        - sk-ant- (Anthropic) before sk- (OpenAI)
+        - sk-ds- (DeepSeek) before sk- (OpenAI)
+        - sk-or- (OpenRouter) before sk- (OpenAI)
+        """
+        # Check specific prefixes first (longer/more specific)
+        specific_order = [
+            "anthropic",    # sk-ant-
+            "deepseek",     # sk-ds-
+            "openrouter",   # sk-or-
+        ]
+        for provider_name in specific_order:
+            info = PROVIDERS[provider_name]
+            if info["prefix"] and key_value.startswith(info["prefix"]):
+                return provider_name
+
+        # Then check all others
         for provider, info in PROVIDERS.items():
+            if provider in specific_order:
+                continue  # Already checked
             if info["prefix"] and key_value.startswith(info["prefix"]):
                 return provider
         return None
@@ -357,7 +400,7 @@ class SmartBrain:
         Returns: (response_text, provider, model, cached)
         """
         # Check cache first
-        cached = self.cache.get(prompt, task_type, "auto")
+        cached = self.cache.get(prompt, task_type, "auto", system_prompt)
         if cached:
             return cached, "cache", "cache", True
 
@@ -380,7 +423,7 @@ class SmartBrain:
                     self.usage[provider]["count"] += 1
 
                     # Cache response
-                    self.cache.set(prompt, task_type, model, response)
+                    self.cache.set(prompt, task_type, model, response, system_prompt)
 
                     return response, provider, model, False
 
@@ -392,14 +435,22 @@ class SmartBrain:
         return f"All providers failed. Last error: {last_error}", "none", "none", False
 
     def _call_provider(self, provider, key, model, prompt, system_prompt=None):
-        """Call a specific provider (placeholder — implement with requests/urllib)"""
-        # This is a framework — actual HTTP calls would go here
-        # For now, route to Ollama as fallback
+        """Call the appropriate provider adapter."""
         if provider == "ollama":
             return self._call_ollama(model, prompt, system_prompt)
+        elif provider == "gemini":
+            return self._call_gemini(key, model, prompt, system_prompt)
+        elif provider == "cloudflare":
+            return self._call_cloudflare(key, model, prompt, system_prompt)
+        elif provider == "huggingface":
+            return self._call_huggingface(key, model, prompt, system_prompt)
+        elif provider == "cohere":
+            return self._call_cohere(key, model, prompt, system_prompt)
+        elif provider == "anthropic":
+            return self._call_anthropic(key, model, prompt, system_prompt)
         else:
-            # Placeholder for cloud providers
-            return self._call_cloud(provider, key, model, prompt, system_prompt)
+            # OpenAI-compatible format (nvidia, groq, mistral, together, openrouter, sambanova, deepseek, openai)
+            return self._call_openai_compatible(provider, key, model, prompt, system_prompt)
 
     def _call_ollama(self, model, prompt, system_prompt=None):
         """Call Ollama locally"""
@@ -413,15 +464,12 @@ class SmartBrain:
             "stream": False,
         }
 
-        try:
-            resp = requests.post(url, json=payload, timeout=120)
-            resp.raise_for_status()
-            return resp.json().get("response", "")
-        except Exception as e:
-            raise Exception(f"Ollama error: {e}")
+        resp = requests.post(url, json=payload, timeout=120)
+        resp.raise_for_status()
+        return resp.json().get("response", "")
 
-    def _call_cloud(self, provider, key, model, prompt, system_prompt=None):
-        """Call cloud provider (OpenAI-compatible format)"""
+    def _call_openai_compatible(self, provider, key, model, prompt, system_prompt=None):
+        """Call any OpenAI-compatible API (nvidia, groq, mistral, together, openrouter, etc.)"""
         import requests
 
         info = PROVIDERS[provider]
@@ -444,12 +492,144 @@ class SmartBrain:
             "max_tokens": 4096,
         }
 
-        try:
-            resp = requests.post(url, json=payload, headers=headers, timeout=60)
-            resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"]
-        except Exception as e:
-            raise Exception(f"{provider} error: {e}")
+        resp = requests.post(url, json=payload, headers=headers, timeout=60)
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
+
+    def _call_gemini(self, key, model, prompt, system_prompt=None):
+        """Call Google Gemini API (non-OpenAI format)."""
+        import requests
+
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+
+        parts = []
+        if system_prompt:
+            parts.append({"text": f"[System]: {system_prompt}\n\n{prompt}"})
+        else:
+            parts.append({"text": prompt})
+
+        payload = {
+            "contents": [{"parts": parts}],
+            "generationConfig": {
+                "temperature": 0.7,
+                "maxOutputTokens": 4096,
+            },
+        }
+
+        resp = requests.post(url, json=payload, timeout=60)
+        resp.raise_for_status()
+        data = resp.json()
+        return data["candidates"][0]["content"]["parts"][0]["text"]
+
+    def _call_cloudflare(self, key, model, prompt, system_prompt=None):
+        """Call Cloudflare Workers AI API."""
+        import requests
+
+        # Cloudflare uses account-based routing
+        # URL format: /accounts/{account_id}/ai/v1/{model}/chat
+        # But we use the simpler /chat endpoint
+        url = f"https://api.cloudflare.com/client/v4/accounts/{key.split(':')[0]}/ai/v1/chat/completions" if ':' in key else f"{PROVIDERS['cloudflare']['base_url']}/chat/completions"
+
+        headers = {
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json",
+        }
+
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
+        payload = {
+            "model": model,
+            "messages": messages,
+        }
+
+        resp = requests.post(url, json=payload, headers=headers, timeout=60)
+        resp.raise_for_status()
+        data = resp.json()
+        return data["result"]["response"]
+
+    def _call_huggingface(self, key, model, prompt, system_prompt=None):
+        """Call HuggingFace Inference API."""
+        import requests
+
+        url = f"https://api-inference.huggingface.co/models/{model}"
+
+        headers = {
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json",
+        }
+
+        full_prompt = f"{system_prompt}\n\n{prompt}" if system_prompt else prompt
+        payload = {
+            "inputs": full_prompt,
+            "parameters": {
+                "max_new_tokens": 4096,
+                "temperature": 0.7,
+            },
+        }
+
+        resp = requests.post(url, json=payload, headers=headers, timeout=120)
+        resp.raise_for_status()
+        data = resp.json()
+
+        # HuggingFace returns a list of generated texts
+        if isinstance(data, list) and len(data) > 0:
+            return data[0].get("generated_text", str(data))
+        return str(data)
+
+    def _call_cohere(self, key, model, prompt, system_prompt=None):
+        """Call Cohere API (non-OpenAI format)."""
+        import requests
+
+        url = "https://api.cohere.ai/v1/chat"
+
+        headers = {
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json",
+        }
+
+        payload = {
+            "model": model,
+            "message": prompt,
+        }
+        if system_prompt:
+            preamble = system_prompt
+        else:
+            preamble = "You are a helpful AI assistant."
+
+        payload["preamble"] = preamble
+
+        resp = requests.post(url, json=payload, headers=headers, timeout=60)
+        resp.raise_for_status()
+        data = resp.json()
+        return data.get("text", str(data))
+
+    def _call_anthropic(self, key, model, prompt, system_prompt=None):
+        """Call Anthropic Claude API (Messages API)."""
+        import requests
+
+        url = "https://api.anthropic.com/v1/messages"
+
+        headers = {
+            "x-api-key": key,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+        }
+
+        payload = {
+            "model": model,
+            "max_tokens": 4096,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        if system_prompt:
+            payload["system"] = system_prompt
+
+        resp = requests.post(url, json=payload, headers=headers, timeout=60)
+        resp.raise_for_status()
+        data = resp.json()
+        return data["content"][0]["text"]
 
     def get_stats(self):
         """Get brain statistics"""

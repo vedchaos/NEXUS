@@ -5,6 +5,8 @@ Authorized security research tools via WSL2 Kali Linux
 """
 
 import json
+import re
+import shlex
 import subprocess
 import sys
 from datetime import datetime
@@ -17,16 +19,47 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 USE_WSL = True  # Use WSL2 Kali Linux
 
 
+def sanitize_target(target):
+    """Validate and sanitize scan target to prevent command injection.
+    
+    Allowed: domain names, IPs, CIDR ranges, URLs (no shell metacharacters).
+    Raises ValueError if target contains dangerous characters.
+    """
+    if not target or not isinstance(target, str):
+        raise ValueError("Target must be a non-empty string")
+    
+    target = target.strip()
+    
+    # Block dangerous shell metacharacters
+    dangerous = re.compile(r'[;&|`$(){}!\n\r\\\'"<>#~]')
+    if dangerous.search(target):
+        raise ValueError(f"Target contains forbidden characters: {target}")
+    
+    # Validate format: domain, IP, CIDR, or URL
+    valid_pattern = re.compile(
+        r'^(https?://)?'                          # optional http(s)://
+        r'[a-zA-Z0-9]'                            # starts with alphanumeric
+        r'[a-zA-Z0-9.\-/]*'                       # allowed chars
+        r'(:\d+)?$'                               # optional port
+    )
+    if not valid_pattern.match(target):
+        raise ValueError(f"Invalid target format: {target}")
+    
+    return target
+
+
 def run_cmd(cmd, timeout=300):
-    """Run a command safely"""
+    """Run a command safely using argument lists (no shell=True injection)."""
     try:
         if USE_WSL:
-            full_cmd = f"wsl -d kali-linux -- bash -c '{cmd}'"
+            # Use argument list — no shell injection possible
+            full_cmd = ["wsl", "-d", "kali-linux", "--", "bash", "-c", cmd]
         else:
-            full_cmd = cmd
+            # On native Linux, run directly
+            full_cmd = ["bash", "-c", cmd]
 
         result = subprocess.run(
-            full_cmd, shell=True, capture_output=True, text=True, timeout=timeout
+            full_cmd, capture_output=True, text=True, timeout=timeout
         )
         return result.stdout + result.stderr
     except subprocess.TimeoutExpired:
@@ -37,35 +70,42 @@ def run_cmd(cmd, timeout=300):
 
 def recon_passive(target):
     """Passive recon — no direct contact"""
+    target = sanitize_target(target)
     results = {}
-    results["whois"] = run_cmd(f"whois {target}", timeout=30)
-    results["dig"] = run_cmd(f"dig {target} ANY +noall +answer", timeout=30)
-    results["nslookup"] = run_cmd(f"nslookup {target}", timeout=30)
-    results["subdomains"] = run_cmd(f"sublist3r -d {target} -silent", timeout=120)
+    results["whois"] = run_cmd(f"whois {shlex.quote(target)}", timeout=30)
+    results["dig"] = run_cmd(f"dig {shlex.quote(target)} ANY +noall +answer", timeout=30)
+    results["nslookup"] = run_cmd(f"nslookup {shlex.quote(target)}", timeout=30)
+    results["subdomains"] = run_cmd(f"sublist3r -d {shlex.quote(target)} -silent", timeout=120)
     return results
 
 
 def recon_active(target, scan_type="quick"):
     """Active recon — direct contact with target"""
+    target = sanitize_target(target)
+    scan_type = sanitize_target(scan_type)  # reuse validator — scan_type should be simple word
+
     if scan_type == "quick":
-        cmd = f"nmap -sV -sC --top-ports 1000 -oG - {target}"
+        cmd = f"nmap -sV -sC --top-ports 1000 -oG - {shlex.quote(target)}"
     elif scan_type == "full":
-        cmd = f"nmap -sV -sC -p- --min-rate 5000 -oG - {target}"
+        cmd = f"nmap -sV -sC -p- --min-rate 5000 -oG - {shlex.quote(target)}"
     elif scan_type == "stealth":
-        cmd = f"nmap -sS -sV --top-ports 1000 -T2 -oG - {target}"
+        cmd = f"nmap -sS -sV --top-ports 1000 -T2 -oG - {shlex.quote(target)}"
     else:
-        cmd = f"nmap -sV --top-ports 100 -oG - {target}"
+        cmd = f"nmap -sV --top-ports 100 -oG - {shlex.quote(target)}"
 
     return run_cmd(cmd, timeout=600)
 
 
 def scan_web(target, port=80):
     """Web vulnerability scanning"""
+    target = sanitize_target(target)
+    port = int(port)  # ensure port is an integer
+
     results = {}
-    results["nikto"] = run_cmd(f"nikto -h {target} -p {port}", timeout=300)
-    results["whatweb"] = run_cmd(f"whatweb {target}", timeout=120)
+    results["nikto"] = run_cmd(f"nikto -h {shlex.quote(target)} -p {port}", timeout=300)
+    results["whatweb"] = run_cmd(f"whatweb {shlex.quote(target)}", timeout=120)
     results["gobuster"] = run_cmd(
-        f"gobuster dir -u http://{target} -w /usr/share/wordlists/dirb/common.txt -t 20 -q",
+        f"gobuster dir -u http://{shlex.quote(target)} -w /usr/share/wordlists/dirb/common.txt -t 20 -q",
         timeout=300
     )
     return results
@@ -73,7 +113,8 @@ def scan_web(target, port=80):
 
 def scan_vulns(target):
     """Vulnerability scanning with nuclei"""
-    output = run_cmd(f"nuclei -u {target} -severity critical,high,medium -json", timeout=600)
+    target = sanitize_target(target)
+    output = run_cmd(f"nuclei -u {shlex.quote(target)} -severity critical,high,medium -json", timeout=600)
     findings = []
     for line in output.strip().split("\n"):
         if line.strip():
@@ -86,6 +127,7 @@ def scan_vulns(target):
 
 def full_scan(target, authorized=False):
     """Complete scan workflow"""
+    target = sanitize_target(target)
     all_results = {}
 
     # Phase 1: Passive
@@ -102,9 +144,10 @@ def full_scan(target, authorized=False):
     if authorized:
         all_results["vulns"] = scan_vulns(target)
 
-    # Save results
+    # Save results — sanitize filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    result_file = RESULTS_DIR / f"full_{target.replace('.', '_')}_{timestamp}.json"
+    safe_name = re.sub(r'[^a-zA-Z0-9._-]', '_', target)
+    result_file = RESULTS_DIR / f"full_{safe_name}_{timestamp}.json"
     result_file.write_text(json.dumps(all_results, indent=2, default=str))
 
     return {"file": str(result_file), "results": all_results}

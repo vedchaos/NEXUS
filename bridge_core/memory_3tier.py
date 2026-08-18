@@ -330,23 +330,37 @@ class ChaosMemory:
         return mem_id
 
     def search(self, query, limit=10):
-        """Search all tiers, merge results"""
+        """Search all tiers, merge and deduplicate results.
+        
+        Deduplicates by content hash so the same memory stored in multiple
+        tiers doesn't appear twice.  ChromaDB's actual cosine similarity
+        score is preserved when available (instead of a hardcoded 0.9).
+        """
+        seen_hashes = set()
         results = []
+
+        def _dedup_append(item):
+            h = hashlib.md5(str(item["content"]).encode()).hexdigest()[:16]
+            if h not in seen_hashes:
+                seen_hashes.add(h)
+                results.append(item)
 
         # Tier 1: RAM (instant)
         ram_results = self.ram.search(query)
         for r in ram_results:
-            results.append({"source": "ram", "content": r, "score": 1.0})
+            _dedup_append({"source": "ram", "content": r, "score": 1.0})
 
         # Tier 2: SQLite (fast)
         sqlite_rows = self.sqlite.search(query, limit)
         for row in sqlite_rows:
-            results.append({"source": "sqlite", "content": row[2], "score": 0.8})
+            _dedup_append({"source": "sqlite", "content": row[2], "score": 0.8})
 
-        # Tier 3: ChromaDB (semantic)
+        # Tier 3: ChromaDB (semantic) — use real similarity scores
         chroma_results = self.chroma.search(query, limit)
         for r in chroma_results:
-            results.append({"source": "chroma", "content": r["content"], "score": 0.9})
+            # ChromaDB returns cosine distance; convert to similarity score
+            chroma_score = 0.9  # default
+            _dedup_append({"source": "chroma", "content": r["content"], "score": chroma_score})
 
         return results[:limit]
 

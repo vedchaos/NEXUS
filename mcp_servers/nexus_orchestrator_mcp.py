@@ -360,16 +360,12 @@ def format_result(req_id, data):
 
 
 def get_memory_stats(orch):
-    """Get memory system stats"""
+    """Get memory system stats — delegates to ChaosMemory.get_stats()"""
     try:
         mem = orch.memory_agent.memory
-        return {
-            "ram_entries": len(mem.ram_cache) if hasattr(mem, "ram_cache") else 0,
-            "db_path": str(getattr(mem, "db_path", "unknown")),
-            "chroma_path": str(getattr(mem, "chroma_path", "unknown")),
-        }
-    except Exception:
-        return {"status": "unavailable"}
+        return mem.get_stats()
+    except Exception as e:
+        return {"status": "unavailable", "error": str(e)}
 
 
 # === Server Entry ===
