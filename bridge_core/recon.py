@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS Security Module — Recon & Vulnerability Scanning
+CHAOS TYPE ZERO Security Module — Recon & Vulnerability Scanning
 Authorized security research tools via WSL2 Kali Linux
 """
 
@@ -12,8 +12,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-NEXUS_ROOT = Path(__file__).parent.parent
-RESULTS_DIR = NEXUS_ROOT / "data" / "scan_results"
+CTZ_ROOT = Path(__file__).parent.parent
+RESULTS_DIR = CTZ_ROOT / "data" / "scan_results"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 USE_WSL = True  # Use WSL2 Kali Linux
@@ -162,4 +162,4 @@ if __name__ == "__main__":
     authorized = "--authorized" in sys.argv
 
     result = full_scan(target, authorized)
-    print(f"\n[NEXUS] Scan complete. Results: {result['file']}")
+    print(f"\n[CHAOS TYPE ZERO] Scan complete. Results: {result['file']}")

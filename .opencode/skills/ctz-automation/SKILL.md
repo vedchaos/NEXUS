@@ -1,4 +1,4 @@
-# NEXUS Automation Skill
+# CHAOS TYPE ZERO Automation Skill
 
 ## What it does
 Full automation engine — triggers, actions, chains, presets. Runs automations in background with SQLite persistence and run history.
@@ -33,15 +33,15 @@ Full automation engine — triggers, actions, chains, presets. Runs automations 
 | `health_check` | System health every N min | `{interval_minutes}` |
 
 ## MCP Tools (9 tools)
-- `nexus_auto_create` — Create automation with trigger + actions
-- `nexus_auto_list` — List all automations
-- `nexus_auto_get` — Get automation by ID
-- `nexus_auto_delete` — Delete automation
-- `nexus_auto_enable` / `nexus_auto_disable` — Toggle
-- `nexus_auto_run` — Trigger immediately
-- `nexus_auto_preset` — Create from preset
-- `nexus_auto_history` — Run history
-- `nexus_auto_stats` — Engine stats
+- `ctz_auto_create` — Create automation with trigger + actions
+- `ctz_auto_list` — List all automations
+- `ctz_auto_get` — Get automation by ID
+- `ctz_auto_delete` — Delete automation
+- `ctz_auto_enable` / `ctz_auto_disable` — Toggle
+- `ctz_auto_run` — Trigger immediately
+- `ctz_auto_preset` — Create from preset
+- `ctz_auto_history` — Run history
+- `ctz_auto_stats` — Engine stats
 
 ## Quick examples
 
@@ -72,7 +72,7 @@ Full automation engine — triggers, actions, chains, presets. Runs automations 
     {"type": "backup", "params": {"src": "C:\\Projects"}},
     {"type": "file_cleanup", "params": {"directory": "C:\\temp", "max_age_days": 3}},
     {"type": "llm_query", "params": {"prompt": "Summarize today's work", "task_type": "write"}},
-    {"type": "notify", "params": {"title": "NEXUS", "message": "Daily ops done", "voice": true}}
+    {"type": "notify", "params": {"title": "CHAOS TYPE ZERO", "message": "Daily ops done", "voice": true}}
   ]
 }
 ```

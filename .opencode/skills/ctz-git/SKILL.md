@@ -1,11 +1,11 @@
 ---
-name: nexus-git
+name: ctz-git
 description: Git operations — commit, push, PR, diff, log. Use when user wants git help, create PR, review commits, or manage branches.
 ---
 
-# NEXUS Git Skill
+# CHAOS TYPE ZERO Git Skill
 
-Git automation for NEXUS.
+Git automation for CHAOS TYPE ZERO.
 
 ## Commands
 - "git status" → show working tree status

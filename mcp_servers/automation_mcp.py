@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-NEXUS Automation MCP Server — 10 tools for full automation control.
+CHAOS TYPE ZERO Automation MCP Server — 10 tools for full automation control.
 Triggers, actions, chains, presets, history, stats.
 """
 import json
 import sys
 from pathlib import Path
 
-NEXUS_ROOT = Path(__file__).parent.parent
-sys.path.insert(0, str(NEXUS_ROOT))
+CTZ_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(CTZ_ROOT))
 
 from bridge_core.automation import get_engine, ACTION_TYPES
 
@@ -22,7 +22,7 @@ def handle_request(req: dict) -> dict:
         return {"jsonrpc": "2.0", "id": req_id, "result": {
             "protocolVersion": "2024-11-05",
             "capabilities": {"tools": {"listChanged": True}},
-            "serverInfo": {"name": "nexus-automation", "version": "1.0.0"},
+            "serverInfo": {"name": "ctz-automation", "version": "1.0.0"},
         }}
 
     if method == "notifications/initialized":
@@ -31,7 +31,7 @@ def handle_request(req: dict) -> dict:
     elif method == "tools/list":
         return {"jsonrpc": "2.0", "id": req_id, "result": {"tools": [
             {
-                "name": "nexus_auto_create",
+                "name": "ctz_auto_create",
                 "description": "Create a new automation with trigger + actions",
                 "inputSchema": {
                     "type": "object",
@@ -46,7 +46,7 @@ def handle_request(req: dict) -> dict:
                 },
             },
             {
-                "name": "nexus_auto_list",
+                "name": "ctz_auto_list",
                 "description": "List all automations",
                 "inputSchema": {
                     "type": "object",
@@ -56,7 +56,7 @@ def handle_request(req: dict) -> dict:
                 },
             },
             {
-                "name": "nexus_auto_get",
+                "name": "ctz_auto_get",
                 "description": "Get details of an automation by ID",
                 "inputSchema": {
                     "type": "object",
@@ -67,7 +67,7 @@ def handle_request(req: dict) -> dict:
                 },
             },
             {
-                "name": "nexus_auto_delete",
+                "name": "ctz_auto_delete",
                 "description": "Delete an automation",
                 "inputSchema": {
                     "type": "object",
@@ -78,7 +78,7 @@ def handle_request(req: dict) -> dict:
                 },
             },
             {
-                "name": "nexus_auto_enable",
+                "name": "ctz_auto_enable",
                 "description": "Enable a disabled automation",
                 "inputSchema": {
                     "type": "object",
@@ -89,7 +89,7 @@ def handle_request(req: dict) -> dict:
                 },
             },
             {
-                "name": "nexus_auto_disable",
+                "name": "ctz_auto_disable",
                 "description": "Disable an automation (stops trigger)",
                 "inputSchema": {
                     "type": "object",
@@ -100,7 +100,7 @@ def handle_request(req: dict) -> dict:
                 },
             },
             {
-                "name": "nexus_auto_run",
+                "name": "ctz_auto_run",
                 "description": "Manually trigger an automation right now",
                 "inputSchema": {
                     "type": "object",
@@ -111,7 +111,7 @@ def handle_request(req: dict) -> dict:
                 },
             },
             {
-                "name": "nexus_auto_preset",
+                "name": "ctz_auto_preset",
                 "description": "Create a pre-built automation (auto_backup, file_cleanup, url_monitor, daily_report, health_check)",
                 "inputSchema": {
                     "type": "object",
@@ -123,7 +123,7 @@ def handle_request(req: dict) -> dict:
                 },
             },
             {
-                "name": "nexus_auto_history",
+                "name": "ctz_auto_history",
                 "description": "Get run history for automations",
                 "inputSchema": {
                     "type": "object",
@@ -134,7 +134,7 @@ def handle_request(req: dict) -> dict:
                 },
             },
             {
-                "name": "nexus_auto_stats",
+                "name": "ctz_auto_stats",
                 "description": "Get automation engine statistics",
                 "inputSchema": {"type": "object", "properties": {}},
             },
@@ -145,7 +145,7 @@ def handle_request(req: dict) -> dict:
         args = params.get("arguments", {})
         engine = get_engine()
 
-        if tool_name == "nexus_auto_create":
+        if tool_name == "ctz_auto_create":
             result = engine.create(
                 name=args.get("name", "Unnamed"),
                 trigger_type=args.get("trigger_type", "interval"),
@@ -157,53 +157,53 @@ def handle_request(req: dict) -> dict:
                 "content": [{"type": "text", "text": json.dumps(result, indent=2, default=str)}],
             }}
 
-        elif tool_name == "nexus_auto_list":
+        elif tool_name == "ctz_auto_list":
             result = engine.list_all(args.get("enabled_only", False))
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(result, indent=2, default=str)}],
             }}
 
-        elif tool_name == "nexus_auto_get":
+        elif tool_name == "ctz_auto_get":
             result = engine.get(args.get("auto_id", ""))
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(result, indent=2, default=str) if result else "Not found"}],
             }}
 
-        elif tool_name == "nexus_auto_delete":
+        elif tool_name == "ctz_auto_delete":
             result = engine.delete(args.get("auto_id", ""))
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": f"Deleted: {result}"}],
             }}
 
-        elif tool_name == "nexus_auto_enable":
+        elif tool_name == "ctz_auto_enable":
             result = engine.enable(args.get("auto_id", ""))
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(result)}],
             }}
 
-        elif tool_name == "nexus_auto_disable":
+        elif tool_name == "ctz_auto_disable":
             result = engine.disable(args.get("auto_id", ""))
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(result)}],
             }}
 
-        elif tool_name == "nexus_auto_run":
+        elif tool_name == "ctz_auto_run":
             result = engine.run_now(args.get("auto_id", ""))
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(result, indent=2, default=str)}],
             }}
 
-        elif tool_name == "nexus_auto_preset":
+        elif tool_name == "ctz_auto_preset":
             preset = args.get("preset", "")
             p = args.get("params", {})
             if preset == "auto_backup":
                 result = engine.preset_auto_backup(
-                    p.get("src_path", str(NEXUS_ROOT)),
+                    p.get("src_path", str(CTZ_ROOT)),
                     p.get("interval_hours", 24),
                 )
             elif preset == "file_cleanup":
                 result = engine.preset_file_cleanup(
-                    p.get("directory", str(NEXUS_ROOT / "data")),
+                    p.get("directory", str(CTZ_ROOT / "data")),
                     p.get("max_age_days", 7),
                     p.get("pattern", "*"),
                 )
@@ -219,13 +219,13 @@ def handle_request(req: dict) -> dict:
                 "content": [{"type": "text", "text": json.dumps(result, indent=2, default=str)}],
             }}
 
-        elif tool_name == "nexus_auto_history":
+        elif tool_name == "ctz_auto_history":
             result = engine.db.get_history(args.get("auto_id"), args.get("limit", 50))
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(result, indent=2, default=str)}],
             }}
 
-        elif tool_name == "nexus_auto_stats":
+        elif tool_name == "ctz_auto_stats":
             result = engine.db.stats()
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(result, indent=2)}],

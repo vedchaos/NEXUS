@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS MCP — Vision Server
+CHAOS TYPE ZERO MCP — Vision Server
 Tools: vision_screenshot, vision_ocr, vision_analyze, vision_find_text, vision_status
 """
 
@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from bridge_core.vision import get_vision
 
 PROTOCOL_VERSION = "2024-11-05"
-SERVER_NAME = "nexus-vision"
+SERVER_NAME = "ctz-vision"
 SERVER_VERSION = "1.0.0"
 
 TOOLS = [

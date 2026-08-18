@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS Smart Brain — LLM Fallback System
+CHAOS TYPE ZERO Smart Brain — LLM Fallback System
 14 providers, 12 task chains, semantic cache, auto key rotation
 """
 
@@ -279,7 +279,7 @@ class LRUCache:
 
 
 class SmartBrain:
-    """NEXUS Smart Brain — LLM routing with fallback and caching"""
+    """CHAOS TYPE ZERO Smart Brain — LLM routing with fallback and caching"""
 
     def __init__(self, keys_file=None):
         self.keys_file = keys_file or Path("config/.env")

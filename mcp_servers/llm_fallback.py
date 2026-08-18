@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS MCP — LLM Fallback Server
+CHAOS TYPE ZERO MCP — LLM Fallback Server
 Exposes Smart Brain as an MCP tool
 """
 
@@ -22,7 +22,7 @@ def handle_request(request):
         return {"jsonrpc": "2.0", "id": req_id, "result": {
             "protocolVersion": "2024-11-05",
             "capabilities": {"tools": {"listChanged": True}},
-            "serverInfo": {"name": "nexus-brain", "version": "1.0.0"},
+            "serverInfo": {"name": "ctz-brain", "version": "1.0.0"},
         }}
 
     if method == "notifications/initialized":
@@ -31,7 +31,7 @@ def handle_request(request):
     elif method == "tools/list":
         return {"jsonrpc": "2.0", "id": req_id, "result": {"tools": [
             {
-                "name": "nexus_query",
+                "name": "ctz_query",
                 "description": "Query LLM with auto provider selection, fallback, and caching",
                 "inputSchema": {
                     "type": "object",
@@ -44,7 +44,7 @@ def handle_request(request):
                 },
             },
             {
-                "name": "nexus_brain_stats",
+                "name": "ctz_brain_stats",
                 "description": "Get brain statistics (providers, cache, usage)",
                 "inputSchema": {"type": "object", "properties": {}},
             },
@@ -56,7 +56,7 @@ def handle_request(request):
 
         brain = get_brain()
 
-        if tool_name == "nexus_query":
+        if tool_name == "ctz_query":
             prompt = args.get("prompt", "")
             task_type = args.get("task_type", "agent")
             system_prompt = args.get("system_prompt")
@@ -66,7 +66,7 @@ def handle_request(request):
                 "metadata": {"provider": provider, "model": model, "cached": cached},
             }}
 
-        elif tool_name == "nexus_brain_stats":
+        elif tool_name == "ctz_brain_stats":
             stats = brain.get_stats()
             return {"jsonrpc": "2.0", "id": req_id, "result": {
                 "content": [{"type": "text", "text": json.dumps(stats, indent=2)}],

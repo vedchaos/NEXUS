@@ -1,11 +1,11 @@
 ---
-name: nexus-ml
+name: ctz-ml
 description: Machine learning — train models, predict, evaluate. Use when user wants ML, train model, predict, classify, regression, data science.
 ---
 
-# NEXUS ML Skill
+# CHAOS TYPE ZERO ML Skill
 
-Machine learning pipeline for NEXUS.
+Machine learning pipeline for CHAOS TYPE ZERO.
 
 ## Capabilities
 - **Train** — Classification and regression models

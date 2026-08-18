@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS MCP — ML Pipeline Server
+CHAOS TYPE ZERO MCP — ML Pipeline Server
 Tools: ml_train, ml_predict, ml_evaluate, ml_list, ml_delete, ml_status
 """
 
@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from bridge_core.ml_pipeline import get_ml_pipeline
 
 PROTOCOL_VERSION = "2024-11-05"
-SERVER_NAME = "nexus-ml"
+SERVER_NAME = "ctz-ml"
 SERVER_VERSION = "1.0.0"
 
 TOOLS = [

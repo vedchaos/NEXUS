@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""NEXUS v1.0 — Full System Test"""
+"""CHAOS TYPE ZERO v1.0 — Full System Test"""
 
 import json, time
 
 print("=" * 60)
-print("   NEXUS v1.0 — Full System Test")
+print("   CHAOS TYPE ZERO v1.0 — Full System Test")
 print("=" * 60)
 
 # 1. Smart Brain
@@ -20,9 +20,9 @@ print(f"  Keys Loaded: {status['keys_loaded']}")
 print("\n[2/5] 3-Tier Memory (RAM + SQLite + ChromaDB)...")
 from bridge_core.memory_3tier import get_memory
 mem = get_memory()
-mem_id = mem.save("NEXUS test memory: system initialized successfully", "test,nexus", "note", 0.9)
+mem_id = mem.save("CHAOS TYPE ZERO test memory: system initialized successfully", "test,ctz", "note", 0.9)
 print(f"  Saved: {mem_id}")
-results = mem.search("NEXUS test")
+results = mem.search("CHAOS TYPE ZERO test")
 print(f"  Found: {len(results)} results")
 for r in results[:2]:
     print(f"    -> {r['content'][:60]}...")

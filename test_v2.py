@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""NEXUS v2.0 — Full System Verification"""
+"""CHAOS TYPE ZERO v2.0 — Full System Verification"""
 
 print("=" * 60)
-print("  NEXUS v2.0 — Full System Verification")
+print("  CHAOS TYPE ZERO v2.0 — Full System Verification")
 print("=" * 60)
 
 # 1. Voice
@@ -16,7 +16,7 @@ print(f"  Language: {status['language']}")
 
 # Test TTS
 print("  Testing TTS...")
-result = v.speak("NEXUS voice module ready")
+result = v.speak("CHAOS TYPE ZERO voice module ready")
 print(f"  TTS Result: {result}")
 
 # 2. Vision
@@ -44,14 +44,15 @@ print(f"  Train accuracy: {result.get('accuracy', 'N/A')}")
 print("\n[4/4] MCP Servers...")
 import subprocess, sys
 servers = [
-    ("nexus-brain", "mcp_servers/llm_fallback.py"),
-    ("nexus-memory", "mcp_servers/memory_mcp.py"),
-    ("nexus-router", "mcp_servers/task_router_mcp.py"),
-    ("nexus-security", "mcp_servers/pentest_mcp.py"),
-    ("nexus-orchestrator", "mcp_servers/nexus_orchestrator_mcp.py"),
-    ("nexus-voice", "mcp_servers/voice_mcp.py"),
-    ("nexus-vision", "mcp_servers/vision_mcp.py"),
-    ("nexus-ml", "mcp_servers/ml_mcp.py"),
+    ("ctz-brain", "mcp_servers/llm_fallback.py"),
+    ("ctz-memory", "mcp_servers/memory_mcp.py"),
+    ("ctz-router", "mcp_servers/task_router_mcp.py"),
+    ("ctz-security", "mcp_servers/pentest_mcp.py"),
+    ("ctz-orchestrator", "mcp_servers/ctz_orchestrator_mcp.py"),
+    ("ctz-voice", "mcp_servers/voice_mcp.py"),
+    ("ctz-vision", "mcp_servers/vision_mcp.py"),
+    ("ctz-ml", "mcp_servers/ml_mcp.py"),
+    ("ctz-automation", "mcp_servers/automation_mcp.py"),
 ]
 init_req = '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
 ok = 0
@@ -67,7 +68,7 @@ for name, script in servers:
         print(f"  {name}: ERROR - {e}")
 
 print(f"\n{'=' * 60}")
-print(f"  RESULT: {ok}/8 MCP servers OK")
+print(f"  RESULT: {ok}/{len(servers)} MCP servers OK")
 print(f"  Voice: {status['stt']} / {status['tts']}")
 print(f"  Tesseract: {vstatus['tesseract']}")
 print(f"  Models trained: {len(ml.list_models())}")

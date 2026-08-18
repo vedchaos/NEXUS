@@ -1,9 +1,9 @@
 ---
-name: nexus-memory
+name: ctz-memory
 description: 3-tier memory management. Use when user wants to save, recall, search, or manage memories and learned knowledge.
 ---
 
-# NEXUS Memory Skill
+# CHAOS TYPE ZERO Memory Skill
 
 3-tier memory system: RAM → SQLite → ChromaDB.
 

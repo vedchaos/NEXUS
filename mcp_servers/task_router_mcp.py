@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS MCP — Task Router Server
+CHAOS TYPE ZERO MCP — Task Router Server
 Auto classifies and routes tasks to appropriate agents/tools
 """
 
@@ -21,7 +21,7 @@ def handle_request(request):
         return {"jsonrpc": "2.0", "id": req_id, "result": {
             "protocolVersion": "2024-11-05",
             "capabilities": {"tools": {"listChanged": True}},
-            "serverInfo": {"name": "nexus-router", "version": "1.0.0"},
+            "serverInfo": {"name": "ctz-router", "version": "1.0.0"},
         }}
 
     if method == "notifications/initialized":

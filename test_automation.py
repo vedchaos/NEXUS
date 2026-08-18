@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""NEXUS Automation Engine — Full Test"""
+"""CHAOS TYPE ZERO Automation Engine — Full Test"""
 import json
 import time
 import sys
 from pathlib import Path
 
-NEXUS_ROOT = Path(__file__).parent
-sys.path.insert(0, str(NEXUS_ROOT))
+CTZ_ROOT = Path(__file__).parent
+sys.path.insert(0, str(CTZ_ROOT))
 
 print("=" * 60)
-print("  NEXUS Automation Engine — Test")
+print("  CHAOS TYPE ZERO Automation Engine — Test")
 print("=" * 60)
 
 # 1. Import & init
@@ -29,7 +29,7 @@ auto1 = engine.create(
     trigger_type="interval",
     trigger_config={"seconds": 300},
     actions=[
-        {"type": "shell", "params": {"command": "echo hello from NEXUS"}},
+        {"type": "shell", "params": {"command": "echo hello from CHAOS TYPE ZERO"}},
         {"type": "log", "params": {"message": "Test automation ran"}},
     ],
     description="Test interval automation",
@@ -76,10 +76,10 @@ print("  Run: OK")
 
 # 5. Presets
 print("\n[5/6] Presets...")
-auto_backup = engine.preset_auto_backup(str(NEXUS_ROOT), interval_hours=1)
+auto_backup = engine.preset_auto_backup(str(CTZ_ROOT), interval_hours=1)
 print(f"  Auto Backup: {auto_backup['id']} — {auto_backup['name']}")
 
-auto_cleanup = engine.preset_file_cleanup(str(NEXUS_ROOT / "data"), max_age_days=7)
+auto_cleanup = engine.preset_file_cleanup(str(CTZ_ROOT / "data"), max_age_days=7)
 print(f"  File Cleanup: {auto_cleanup['id']} — {auto_cleanup['name']}")
 
 auto_report = engine.preset_daily_report()
@@ -114,10 +114,10 @@ print("    0 9 * * 1-5 on Monday 09:00: MATCH")
 # 8. File watcher
 print("\n  File watcher test:")
 fw = FileWatcher()
-r1 = fw.snapshot("test_watch", str(NEXUS_ROOT), "*.py")
+r1 = fw.snapshot("test_watch", str(CTZ_ROOT), "*.py")
 print(f"    Initial: {r1.get('status')} — {r1.get('files', 0)} files")
 assert r1.get("status") == "initial_snapshot"
-r2 = fw.snapshot("test_watch", str(NEXUS_ROOT), "*.py")
+r2 = fw.snapshot("test_watch", str(CTZ_ROOT), "*.py")
 print(f"    Second: changes={r2.get('has_changes', False)}")
 assert not r2.get("has_changes", True), "Should be no changes"
 

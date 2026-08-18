@@ -1,9 +1,9 @@
 ---
-name: nexus-scheduler
+name: ctz-scheduler
 description: Task scheduling with Hinglish support. Use when user wants to schedule tasks, set reminders, or automate recurring work.
 ---
 
-# NEXUS Scheduler Skill
+# CHAOS TYPE ZERO Scheduler Skill
 
 Hinglish-aware task scheduler.
 

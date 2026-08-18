@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS Automation Engine — Triggers, Actions, Chains, Persistence
+CHAOS TYPE ZERO Automation Engine — Triggers, Actions, Chains, Persistence
 Runs automations in background threads with full event history.
 """
 
@@ -19,8 +19,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-NEXUS_ROOT = Path(__file__).parent.parent
-DATA_DIR = NEXUS_ROOT / "data" / "automation"
+CTZ_ROOT = Path(__file__).parent.parent
+DATA_DIR = CTZ_ROOT / "data" / "automation"
 DB_PATH = DATA_DIR / "automations.db"
 LOGS_DIR = DATA_DIR / "logs"
 
@@ -36,7 +36,7 @@ $textNodes = $template.GetElementsByTagName("text")
 $textNodes.Item(0).AppendChild($template.CreateTextNode("{title}")) | Out-Null
 $textNodes.Item(1).AppendChild($template.CreateTextNode("{message}")) | Out-Null
 $toast = [Windows.UI.Notifications.ToastNotification]::new($template)
-[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("NEXUS").Show($toast)'''
+[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("CHAOS TYPE ZERO").Show($toast)'''
         subprocess.Popen(["powershell", "-Command", ps],
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception:
@@ -135,7 +135,7 @@ def action_api_call(params: dict) -> dict:
 
 def action_notify(params: dict) -> dict:
     """Send notification (toast + optional voice)."""
-    title = params.get("title", "NEXUS")
+    title = params.get("title", "CHAOS TYPE ZERO")
     message = params.get("message", "")
     voice = params.get("voice", False)
     _notify_windows(title, message)
@@ -165,7 +165,7 @@ def action_llm_query(params: dict) -> dict:
 def action_backup(params: dict) -> dict:
     """Backup a file or directory."""
     src = params.get("src", "")
-    dst_dir = params.get("dst_dir", str(NEXUS_ROOT / "data" / "backups"))
+    dst_dir = params.get("dst_dir", str(CTZ_ROOT / "data" / "backups"))
     if not src:
         return {"error": "src required"}
     try:
@@ -757,7 +757,7 @@ class AutomationEngine:
         ]
         if notify:
             actions.append({"type": "notify", "params": {
-                "title": "NEXUS URL Monitor",
+                "title": "CHAOS TYPE ZERO URL Monitor",
                 "message": f"Content changed: {url}",
             }})
         return self.create(
@@ -780,7 +780,7 @@ class AutomationEngine:
                     "task_type": "write",
                 }},
                 {"type": "notify", "params": {
-                    "title": "NEXUS Daily Report",
+                    "title": "CHAOS TYPE ZERO Daily Report",
                     "message": "Daily report generated — check logs",
                     "voice": True,
                 }},
@@ -795,7 +795,7 @@ class AutomationEngine:
             trigger_type="interval",
             trigger_config={"seconds": interval_minutes * 60},
             actions=[
-                {"type": "shell", "params": {"command": "echo NEXUS health check OK"}},
+                {"type": "shell", "params": {"command": "echo CHAOS TYPE ZERO health check OK"}},
                 {"type": "log", "params": {"message": "Health check passed"}},
             ],
             description=f"System health check every {interval_minutes} min",

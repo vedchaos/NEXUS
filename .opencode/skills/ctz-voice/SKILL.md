@@ -1,11 +1,11 @@
 ---
-name: nexus-voice
-description: Voice commands — speak, listen, transcribe audio. Use when user wants to talk to NEXUS, hear responses, or process audio files.
+name: ctz-voice
+description: Voice commands — speak, listen, transcribe audio. Use when user wants to talk to CHAOS TYPE ZERO, hear responses, or process audio files.
 ---
 
-# NEXUS Voice Skill
+# CHAOS TYPE ZERO Voice Skill
 
-Voice interaction for NEXUS.
+Voice interaction for CHAOS TYPE ZERO.
 
 ## Capabilities
 - **Speak** — Read text aloud (pyttsx3)

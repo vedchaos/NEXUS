@@ -1,11 +1,11 @@
 ---
-name: nexus-security
+name: ctz-security
 description: Security scanning and penetration testing. Use when user asks to scan, hack, pentest, vulnerability assessment, nmap, nuclei, sqlmap, or security audit.
 ---
 
-# NEXUS Security Skill
+# CHAOS TYPE ZERO Security Skill
 
-Security scanning toolkit for NEXUS. All scans require explicit authorization.
+Security scanning toolkit for CHAOS TYPE ZERO. All scans require explicit authorization.
 
 ## Tools Available
 - `pentest_scan` — Full vulnerability scan

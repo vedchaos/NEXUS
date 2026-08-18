@@ -1,47 +1,47 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "username": "nexus-operator",
+  "username": "ctz-operator",
   "model": "ollama/goekdenizguelmez/JOSIEFIED-Qwen3:8b",
   "small_model": "ollama/goekdenizguelmez/JOSIEFIED-Qwen3:8b",
-  "default_agent": "nexus",
+  "default_agent": "ctz",
   "shell": "powershell",
   "logLevel": "INFO",
   "share": "manual",
   "autoupdate": false,
-  "instructions": ["SOUL_NEXUS.md"],
+  "instructions": ["SOUL_CTZ.md"],
 
   "skills": {
     "paths": [".opencode/skills"]
   },
 
   "agent": {
-    "nexus": {
-      "description": "NEXUS primary agent — autonomous AI OS with 3-tier memory, multi-provider LLM, security scanning, ML pipeline, voice/vision.",
+    "ctz": {
+      "description": "CHAOS TYPE ZERO primary agent — autonomous AI OS with 3-tier memory, multi-provider LLM, security scanning, ML pipeline, voice/vision.",
       "mode": "primary",
       "model": "ollama/goekdenizguelmez/JOSIEFIED-Qwen3:8b",
       "color": "error"
     },
-    "nexus-recon": {
+    "ctz-recon": {
       "description": "Reconnaissance subagent. Passive + active recon, OSINT, subdomain enumeration.",
       "mode": "subagent",
       "model": "ollama/goekdenizguelmez/JOSIEFIED-Qwen3:8b"
     },
-    "nexus-scan": {
+    "ctz-scan": {
       "description": "Vulnerability scanning subagent. Nmap, Nuclei, Nikto, Gobuster.",
       "mode": "subagent",
       "model": "ollama/goekdenizguelmez/JOSIEFIED-Qwen3:8b"
     },
-    "nexus-exploit": {
+    "ctz-exploit": {
       "description": "Exploitation subagent. SQLMap, Hydra, Metasploit. AUTHORIZATION REQUIRED.",
       "mode": "subagent",
       "model": "ollama/goekdenizguelmez/JOSIEFIED-Qwen3:8b"
     },
-    "nexus-ml": {
+    "ctz-ml": {
       "description": "ML development subagent. Training, evaluation, deployment pipelines.",
       "mode": "subagent",
       "model": "ollama/goekdenizguelmez/JOSIEFIED-Qwen3:8b"
     },
-    "nexus-code": {
+    "ctz-code": {
       "description": "Code review and development subagent.",
       "mode": "subagent",
       "model": "ollama/goekdenizguelmez/JOSIEFIED-Qwen3:8b"
@@ -49,47 +49,47 @@
   },
 
   "mcp": {
-    "nexus-brain": {
+    "ctz-brain": {
       "type": "local",
       "command": ["python", "mcp_servers/llm_fallback.py"],
       "enabled": true
     },
-    "nexus-memory": {
+    "ctz-memory": {
       "type": "local",
       "command": ["python", "mcp_servers/memory_mcp.py"],
       "enabled": true
     },
-    "nexus-router": {
+    "ctz-router": {
       "type": "local",
       "command": ["python", "mcp_servers/task_router_mcp.py"],
       "enabled": true
     },
-    "nexus-security": {
+    "ctz-security": {
       "type": "local",
       "command": ["python", "mcp_servers/pentest_mcp.py"],
       "enabled": true
     },
-    "nexus-orchestrator": {
+    "ctz-orchestrator": {
       "type": "local",
-      "command": ["python", "mcp_servers/nexus_orchestrator_mcp.py"],
+      "command": ["python", "mcp_servers/ctz_orchestrator_mcp.py"],
       "enabled": true
     },
-    "nexus-voice": {
+    "ctz-voice": {
       "type": "local",
       "command": ["python", "mcp_servers/voice_mcp.py"],
       "enabled": true
     },
-    "nexus-vision": {
+    "ctz-vision": {
       "type": "local",
       "command": ["python", "mcp_servers/vision_mcp.py"],
       "enabled": true
     },
-    "nexus-ml": {
+    "ctz-ml": {
       "type": "local",
       "command": ["python", "mcp_servers/ml_mcp.py"],
       "enabled": true
     },
-    "nexus-automation": {
+    "ctz-automation": {
       "type": "local",
       "command": ["python", "mcp_servers/automation_mcp.py"],
       "enabled": true

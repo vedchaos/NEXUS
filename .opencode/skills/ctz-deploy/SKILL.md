@@ -1,11 +1,11 @@
 ---
-name: nexus-deploy
+name: ctz-deploy
 description: Deployment automation. Use when user wants to deploy, build, CI/CD, Docker, or release management.
 ---
 
-# NEXUS Deploy Skill
+# CHAOS TYPE ZERO Deploy Skill
 
-Deployment and CI/CD for NEXUS.
+Deployment and CI/CD for CHAOS TYPE ZERO.
 
 ## Capabilities
 - **Build** — Compile and package applications

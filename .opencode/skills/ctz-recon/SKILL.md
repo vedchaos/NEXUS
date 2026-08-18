@@ -1,11 +1,11 @@
 ---
-name: nexus-recon
+name: ctz-recon
 description: Reconnaissance and OSINT. Use when user wants to gather info about targets, subdomains, DNS, ports, or open source intelligence.
 ---
 
-# NEXUS Recon Skill
+# CHAOS TYPE ZERO Recon Skill
 
-Reconnaissance toolkit for NEXUS.
+Reconnaissance toolkit for CHAOS TYPE ZERO.
 
 ## Recon Types
 1. **Passive** — DNS, WHOIS, subdomains (no direct contact)

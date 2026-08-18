@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS Task Classifier
+CHAOS TYPE ZERO Task Classifier
 Auto-classifies user requests into task types for routing
 12 task types with confidence scoring
 """

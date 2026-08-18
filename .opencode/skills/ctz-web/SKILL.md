@@ -1,11 +1,11 @@
 ---
-name: nexus-web
+name: ctz-web
 description: Web browsing, scraping, API calls. Use when user wants to browse website, scrape data, call API, or fetch web content.
 ---
 
-# NEXUS Web Skill
+# CHAOS TYPE ZERO Web Skill
 
-Web interaction for NEXUS.
+Web interaction for CHAOS TYPE ZERO.
 
 ## Capabilities
 - **Browse** — Navigate and interact with websites

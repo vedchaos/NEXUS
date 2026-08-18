@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS Scheduler — Hinglish time parsing + full cron support
+CHAOS TYPE ZERO Scheduler — Hinglish time parsing + full cron support
 Supports: cron (all 5 fields), natural language, Hinglish time expressions
 """
 
@@ -9,8 +9,8 @@ import re
 from datetime import datetime, timedelta
 from pathlib import Path
 
-NEXUS_ROOT = Path(__file__).parent.parent
-SCHEDULE_DIR = NEXUS_ROOT / "data"
+CTZ_ROOT = Path(__file__).parent.parent
+SCHEDULE_DIR = CTZ_ROOT / "data"
 CONFIG_FILE = SCHEDULE_DIR / "schedule_config.json"
 
 # === Hinglish Time Parser ===

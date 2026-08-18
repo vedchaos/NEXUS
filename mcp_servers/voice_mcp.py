@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS MCP — Voice Server
+CHAOS TYPE ZERO MCP — Voice Server
 Tools: voice_speak, voice_listen, voice_transcribe, voice_save, voice_status
 """
 
@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from bridge_core.voice import get_voice
 
 PROTOCOL_VERSION = "2024-11-05"
-SERVER_NAME = "nexus-voice"
+SERVER_NAME = "ctz-voice"
 SERVER_VERSION = "1.0.0"
 
 TOOLS = [

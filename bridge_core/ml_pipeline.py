@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS ML Pipeline — Training, Evaluation, Deployment
+CHAOS TYPE ZERO ML Pipeline — Training, Evaluation, Deployment
 Uses: scikit-learn, numpy, pandas, matplotlib
 """
 
@@ -13,12 +13,12 @@ from pathlib import Path
 
 import numpy as np
 
-NEXUS_ROOT = Path(__file__).parent.parent
-MODELS_DIR = NEXUS_ROOT / "data" / "models"
+CTZ_ROOT = Path(__file__).parent.parent
+MODELS_DIR = CTZ_ROOT / "data" / "models"
 
 
-class NexusMLPipeline:
-    """NEXUS ML Pipeline — train, evaluate, deploy models"""
+class CTZMLPipeline:
+    """CHAOS TYPE ZERO ML Pipeline — train, evaluate, deploy models"""
 
     def __init__(self):
         MODELS_DIR.mkdir(parents=True, exist_ok=True)
@@ -252,16 +252,16 @@ class NexusMLPipeline:
 _ml = None
 
 
-def get_ml_pipeline() -> NexusMLPipeline:
+def get_ml_pipeline() -> CTZMLPipeline:
     global _ml
     if _ml is None:
-        _ml = NexusMLPipeline()
+        _ml = CTZMLPipeline()
     return _ml
 
 
 if __name__ == "__main__":
     pipeline = get_ml_pipeline()
-    print("=== NEXUS ML Pipeline ===")
+    print("=== CHAOS TYPE ZERO ML Pipeline ===")
     print(f"Status: {json.dumps(pipeline.get_status(), indent=2)}")
 
     # Quick test with synthetic data

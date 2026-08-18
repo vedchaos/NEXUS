@@ -1,4 +1,4 @@
-# NEXUS bridge_core — Core modules
+# CHAOS TYPE ZERO bridge_core — Core modules
 from .smart_brain import get_brain
 from .memory_3tier import get_memory
 from .agents import get_orchestrator

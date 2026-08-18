@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-NEXUS MCP — Agent Orchestrator Server
+CHAOS TYPE ZERO MCP — Agent Orchestrator Server
 6-agent OMO Sisyphus loop with adaptive critique
-Tools: nexus_run, nexus_plan, nexus_execute, nexus_critique,
-       nexus_remember, nexus_recall, nexus_summarize, nexus_status
+Tools: ctz_run, ctz_plan, ctz_execute, ctz_critique,
+       ctz_remember, ctz_recall, ctz_summarize, ctz_status
 """
 
 import json
@@ -18,15 +18,15 @@ from bridge_core.agents import get_orchestrator
 
 # === MCP Protocol ===
 PROTOCOL_VERSION = "2024-11-05"
-SERVER_NAME = "nexus-orchestrator"
+SERVER_NAME = "ctz-orchestrator"
 SERVER_VERSION = "1.0.0"
 
 # === Tool Definitions ===
 TOOLS = [
     {
-        "name": "nexus_run",
+        "name": "ctz_run",
         "description": (
-            "Run the full NEXUS 6-agent Sisyphus loop: "
+            "Run the full CHAOS TYPE ZERO 6-agent Sisyphus loop: "
             "Plan → Execute → Critique → Refine → Memory → Report. "
             "Use for complex multi-step tasks that need planning and quality review."
         ),
@@ -56,7 +56,7 @@ TOOLS = [
         },
     },
     {
-        "name": "nexus_plan",
+        "name": "ctz_plan",
         "description": (
             "Create a step-by-step execution plan without running it. "
             "Returns steps, estimated time, risk level, and whether authorization is needed."
@@ -77,17 +77,17 @@ TOOLS = [
         },
     },
     {
-        "name": "nexus_execute",
+        "name": "ctz_execute",
         "description": (
             "Execute a single planned step. Returns execution status and output. "
-            "Use after nexus_plan to run individual steps."
+            "Use after ctz_plan to run individual steps."
         ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "step": {
                     "type": "object",
-                    "description": "Step object from nexus_plan: {id, action, tool, args}",
+                    "description": "Step object from ctz_plan: {id, action, tool, args}",
                 },
                 "context": {
                     "type": "object",
@@ -98,7 +98,7 @@ TOOLS = [
         },
     },
     {
-        "name": "nexus_critique",
+        "name": "ctz_critique",
         "description": (
             "Review any work output for quality, accuracy, security issues. "
             "Returns score (1-10), issues, strengths, and pass/fail."
@@ -119,9 +119,9 @@ TOOLS = [
         },
     },
     {
-        "name": "nexus_remember",
+        "name": "ctz_remember",
         "description": (
-            "Save information to NEXUS long-term memory (3-tier: RAM→SQLite→ChromaDB). "
+            "Save information to CHAOS TYPE ZERO long-term memory (3-tier: RAM→SQLite→ChromaDB). "
             "Auto-promotes based on access frequency and importance."
         ),
         "inputSchema": {
@@ -151,9 +151,9 @@ TOOLS = [
         },
     },
     {
-        "name": "nexus_recall",
+        "name": "ctz_recall",
         "description": (
-            "Search NEXUS long-term memory using semantic search. "
+            "Search CHAOS TYPE ZERO long-term memory using semantic search. "
             "Returns ranked results from RAM cache, SQLite, and ChromaDB."
         ),
         "inputSchema": {
@@ -177,7 +177,7 @@ TOOLS = [
         },
     },
     {
-        "name": "nexus_summarize",
+        "name": "ctz_summarize",
         "description": (
             "Summarize a conversation or session for long-term memory storage. "
             "Extracts decisions, findings, completed tasks, and pending items."
@@ -195,9 +195,9 @@ TOOLS = [
         },
     },
     {
-        "name": "nexus_status",
+        "name": "ctz_status",
         "description": (
-            "Get NEXUS orchestrator status: agents available, memory stats, "
+            "Get CHAOS TYPE ZERO orchestrator status: agents available, memory stats, "
             "last task, uptime, provider health."
         ),
         "inputSchema": {
@@ -254,8 +254,8 @@ def handle_tool_call(tool_name, args, req_id):
         orch = get_orchestrator()
         result = None
 
-        # --- nexus_run ---
-        if tool_name == "nexus_run":
+        # --- ctz_run ---
+        if tool_name == "ctz_run":
             if "max_iterations" in args:
                 orch.max_iterations = args["max_iterations"]
             if "adaptive" in args:
@@ -263,28 +263,28 @@ def handle_tool_call(tool_name, args, req_id):
             result = orch.run(args["request"], args.get("context"))
             return format_result(req_id, result)
 
-        # --- nexus_plan ---
-        elif tool_name == "nexus_plan":
+        # --- ctz_plan ---
+        elif tool_name == "ctz_plan":
             plan = orch.planner.plan(args["request"], args.get("context"))
             return format_result(req_id, {
                 "plan": plan,
-                "message": "Plan created. Use nexus_execute to run steps.",
+                "message": "Plan created. Use ctz_execute to run steps.",
             })
 
-        # --- nexus_execute ---
-        elif tool_name == "nexus_execute":
+        # --- ctz_execute ---
+        elif tool_name == "ctz_execute":
             step = args["step"]
             result = orch.executor.execute(step, args.get("context"))
             return format_result(req_id, result)
 
-        # --- nexus_critique ---
-        elif tool_name == "nexus_critique":
+        # --- ctz_critique ---
+        elif tool_name == "ctz_critique":
             criteria = args.get("criteria", "quality, accuracy, completeness, security")
             result = orch.critic.review(args["work"], criteria)
             return format_result(req_id, result)
 
-        # --- nexus_remember ---
-        elif tool_name == "nexus_remember":
+        # --- ctz_remember ---
+        elif tool_name == "ctz_remember":
             result = orch.memory_agent.remember(
                 content=args["content"],
                 tags=args.get("tags", ""),
@@ -293,16 +293,16 @@ def handle_tool_call(tool_name, args, req_id):
             )
             return format_result(req_id, result)
 
-        # --- nexus_recall ---
-        elif tool_name == "nexus_recall":
+        # --- ctz_recall ---
+        elif tool_name == "ctz_recall":
             results = orch.memory_agent.recall(
                 query=args["query"],
                 limit=args.get("limit", 10),
             )
             return format_result(req_id, results)
 
-        # --- nexus_summarize ---
-        elif tool_name == "nexus_summarize":
+        # --- ctz_summarize ---
+        elif tool_name == "ctz_summarize":
             summary = orch.memory_agent.summarize_session(args["conversation"])
             # Also save the summary to memory
             orch.memory_agent.remember(
@@ -313,8 +313,8 @@ def handle_tool_call(tool_name, args, req_id):
             )
             return format_result(req_id, summary)
 
-        # --- nexus_status ---
-        elif tool_name == "nexus_status":
+        # --- ctz_status ---
+        elif tool_name == "ctz_status":
             status = {
                 "server": SERVER_NAME,
                 "version": SERVER_VERSION,
@@ -343,7 +343,7 @@ def handle_tool_call(tool_name, args, req_id):
             "jsonrpc": "2.0",
             "id": req_id,
             "result": {
-                "content": [{"type": "text", "text": f"[NEXUS ERROR] {e}\n\n{tb}"}],
+                "content": [{"type": "text", "text": f"[CTZ ERROR] {e}\n\n{tb}"}],
                 "isError": True,
             },
         }

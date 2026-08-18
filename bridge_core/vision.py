@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS Vision Module — Screenshot + OCR + Image Analysis
+CHAOS TYPE ZERO Vision Module — Screenshot + OCR + Image Analysis
 Uses: Pillow, Tesseract OCR, OpenAI CLIP (optional)
 """
 
@@ -11,12 +11,12 @@ import tempfile
 from pathlib import Path
 from datetime import datetime
 
-NEXUS_ROOT = Path(__file__).parent.parent
-SCREENSHOTS_DIR = NEXUS_ROOT / "data" / "screenshots"
+CTZ_ROOT = Path(__file__).parent.parent
+SCREENSHOTS_DIR = CTZ_ROOT / "data" / "screenshots"
 
 
-class NexusVision:
-    """NEXUS Vision Engine — see and understand"""
+class CTZVision:
+    """CHAOS TYPE ZERO Vision Engine — see and understand"""
 
     def __init__(self):
         self._tesseract_path = None
@@ -194,14 +194,14 @@ class NexusVision:
 _vision = None
 
 
-def get_vision() -> NexusVision:
+def get_vision() -> CTZVision:
     global _vision
     if _vision is None:
-        _vision = NexusVision()
+        _vision = CTZVision()
     return _vision
 
 
 if __name__ == "__main__":
     vision = get_vision()
-    print("=== NEXUS Vision Module ===")
+    print("=== CHAOS TYPE ZERO Vision Module ===")
     print(f"Status: {json.dumps(vision.get_status(), indent=2)}")

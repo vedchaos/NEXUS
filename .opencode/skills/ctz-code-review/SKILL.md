@@ -1,11 +1,11 @@
 ---
-name: nexus-code-review
+name: ctz-code-review
 description: Code review, refactoring, bug detection. Use when user wants code review, find bugs, refactor, optimize code, or code analysis.
 ---
 
-# NEXUS Code Review Skill
+# CHAOS TYPE ZERO Code Review Skill
 
-Strict code review for NEXUS.
+Strict code review for CHAOS TYPE ZERO.
 
 ## Review Checklist
 1. **Bugs** — Logic errors, edge cases, null checks

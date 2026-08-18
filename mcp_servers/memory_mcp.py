@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS MCP — Memory Server
+CHAOS TYPE ZERO MCP — Memory Server
 Exposes 3-tier memory as MCP tools
 """
 
@@ -21,7 +21,7 @@ def handle_request(request):
         return {"jsonrpc": "2.0", "id": req_id, "result": {
             "protocolVersion": "2024-11-05",
             "capabilities": {"tools": {"listChanged": True}},
-            "serverInfo": {"name": "nexus-memory", "version": "1.0.0"},
+            "serverInfo": {"name": "ctz-memory", "version": "1.0.0"},
         }}
 
     if method == "notifications/initialized":

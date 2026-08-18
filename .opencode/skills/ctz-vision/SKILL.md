@@ -1,11 +1,11 @@
 ---
-name: nexus-vision
+name: ctz-vision
 description: Screen reading, OCR, screenshot analysis. Use when user wants to see screen, read text from images, or analyze visual content.
 ---
 
-# NEXUS Vision Skill
+# CHAOS TYPE ZERO Vision Skill
 
-Visual perception for NEXUS.
+Visual perception for CHAOS TYPE ZERO.
 
 ## Capabilities
 - **Screenshot** — Capture screen or region

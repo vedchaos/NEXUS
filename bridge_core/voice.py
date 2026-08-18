@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS Voice Module — Speech-to-Text + Text-to-Speech
+CHAOS TYPE ZERO Voice Module — Speech-to-Text + Text-to-Speech
 Uses: Whisper (local), pyttsx3 (offline TTS)
 """
 
@@ -11,11 +11,11 @@ import tempfile
 import threading
 from pathlib import Path
 
-NEXUS_ROOT = Path(__file__).parent.parent
+CTZ_ROOT = Path(__file__).parent.parent
 
 
-class NexusVoice:
-    """NEXUS Voice Engine — hear and speak"""
+class CTZVoice:
+    """CHAOS TYPE ZERO Voice Engine — hear and speak"""
 
     def __init__(self):
         self._stt_model = None
@@ -168,17 +168,17 @@ class NexusVoice:
 _voice = None
 
 
-def get_voice() -> NexusVoice:
+def get_voice() -> CTZVoice:
     global _voice
     if _voice is None:
-        _voice = NexusVoice()
+        _voice = CTZVoice()
     return _voice
 
 
 if __name__ == "__main__":
     voice = get_voice()
-    print("=== NEXUS Voice Module ===")
+    print("=== CHAOS TYPE ZERO Voice Module ===")
     print(f"Status: {json.dumps(voice.get_status(), indent=2)}")
     print("\nTesting TTS...")
-    result = voice.speak("NEXUS voice module initialized. Ready to serve.")
+    result = voice.speak("CHAOS TYPE ZERO voice module initialized. Ready to serve.")
     print(f"TTS: {result}")

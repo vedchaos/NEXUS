@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS 3-Tier Memory System
+CHAOS TYPE ZERO 3-Tier Memory System
 Tier 1: RAM (LRU cache) — instant recall
 Tier 2: SQLite (persistent) — structured queries
 Tier 3: ChromaDB (semantic) — natural language search
@@ -15,10 +15,10 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from pathlib import Path
 
-NEXUS_ROOT = Path(__file__).parent.parent
-DATA_DIR = NEXUS_ROOT / "data"
+CTZ_ROOT = Path(__file__).parent.parent
+DATA_DIR = CTZ_ROOT / "data"
 MEMORY_DIR = DATA_DIR / "memory"
-DB_PATH = MEMORY_DIR / "nexus_ledger.db"
+DB_PATH = MEMORY_DIR / "ctz_ledger.db"
 CHROMA_PATH = MEMORY_DIR / "chromadb"
 
 # Auto-create dirs
@@ -244,11 +244,11 @@ class ChromaMemory:
             import chromadb
             self.client = chromadb.PersistentClient(path=str(CHROMA_PATH))
             self.memories_col = self.client.get_or_create_collection(
-                name="nexus_memories",
+                name="ctz_memories",
                 metadata={"hnsw:space": "cosine"}
             )
             self.findings_col = self.client.get_or_create_collection(
-                name="nexus_findings",
+                name="ctz_findings",
                 metadata={"hnsw:space": "cosine"}
             )
         except ImportError:

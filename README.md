@@ -1,4 +1,4 @@
-# NEXUS
+# CHAOS TYPE ZERO
 
 **N**eural **E**ngine for **X**enolithic **U**nified **S**ystems
 
@@ -6,9 +6,9 @@
 
 ---
 
-## What is NEXUS?
+## What is CHAOS TYPE ZERO?
 
-NEXUS is a personal AI agent that combines:
+CHAOS TYPE ZERO is a personal AI agent that combines:
 
 - **14 LLM Providers** — Free-first with auto-fallback (NVIDIA, Groq, Mistral, Gemini, Ollama...)
 - **3-Tier Memory** — RAM (instant) → SQLite (structured) → ChromaDB (semantic)
@@ -25,8 +25,8 @@ NEXUS is a personal AI agent that combines:
 
 ```bash
 # Clone
-git clone https://github.com/YOUR_USERNAME/nexus.git
-cd nexus
+git clone https://github.com/YOUR_USERNAME/ctz.git
+cd ctz
 
 # Install dependencies
 pip install -r requirements.txt
@@ -49,8 +49,8 @@ python bridge_core/smart_brain.py
 ## Architecture
 
 ```
-NEXUS/
-├── SOUL_NEXUS.md                 ← Agent identity (hot-reload)
+CHAOS TYPE ZERO/
+├── SOUL_CHAOS TYPE ZERO.md                 ← Agent identity (hot-reload)
 ├── bridge_core/                  ← Python modules (the brain)
 │   ├── smart_brain.py           ← 14 LLM providers, 12 task chains
 │   ├── memory_3tier.py          ← RAM + SQLite + ChromaDB
@@ -63,7 +63,7 @@ NEXUS/
 │   ├── memory_mcp.py           ← Memory MCP
 │   ├── task_router_mcp.py      ← Router MCP
 │   ├── pentest_mcp.py          ← Security MCP
-│   └── nexus_orchestrator_mcp.py  ← Orchestrator MCP
+│   └── ctz_orchestrator_mcp.py  ← Orchestrator MCP
 ├── .opencode/                    ← OpenCode integration
 │   ├── agents/                  ← Agent definitions
 │   ├── skills/                  ← Skill modules
@@ -190,17 +190,17 @@ wsl -d kali-linux -- nuclei -u target.com
 ## Usage with OpenCode
 
 ```bash
-cd nexus
+cd ctz
 opencode
 ```
 
 ### Available Agents
-- `nexus` — Primary agent (default)
-- `nexus-recon` — Reconnaissance specialist
-- `nexus-scan` — Vulnerability scanner
-- `nexus-exploit` — Exploitation (authorized only)
-- `nexus-ml` — Machine learning
-- `nexus-code` — Code review
+- `ctz` — Primary agent (default)
+- `ctz-recon` — Reconnaissance specialist
+- `ctz-scan` — Vulnerability scanner
+- `ctz-exploit` — Exploitation (authorized only)
+- `ctz-ml` — Machine learning
+- `ctz-code` — Code review
 
 ---
 

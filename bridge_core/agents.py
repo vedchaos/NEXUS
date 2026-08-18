@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NEXUS 6-Agent OMO Sisyphus Orchestrator
+CHAOS TYPE ZERO 6-Agent OMO Sisyphus Orchestrator
 Plan → Execute → Critique → Refine → Memory → Report
 """
 
@@ -13,12 +13,12 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-# Import NEXUS modules
+# Import CHAOS TYPE ZERO modules
 sys.path.insert(0, str(Path(__file__).parent))
 from .smart_brain import get_brain
 from .memory_3tier import get_memory
 
-NEXUS_ROOT = Path(__file__).parent.parent
+CTZ_ROOT = Path(__file__).parent.parent
 
 
 class Agent:
@@ -34,7 +34,7 @@ class Agent:
     def _load_soul(self, path):
         if path and Path(path).exists():
             return Path(path).read_text()
-        return f"You are NEXUS {self.name}. Role: {self.role}"
+        return f"You are CHAOS TYPE ZERO {self.name}. Role: {self.role}"
 
     def think(self, context, task_type="agent"):
         """Use LLM to think about a task"""
@@ -472,5 +472,5 @@ def get_orchestrator():
 
 if __name__ == "__main__":
     orch = get_orchestrator()
-    result = orch.run("Initialize NEXUS memory system and save a test entry")
+    result = orch.run("Initialize CHAOS TYPE ZERO memory system and save a test entry")
     print(json.dumps(result, indent=2))
