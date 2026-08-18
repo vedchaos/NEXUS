@@ -47,3 +47,4 @@ package-lock.json
 *.tmp
 *.temp
 *.bak
+data/automation/

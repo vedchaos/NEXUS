@@ -8,3 +8,4 @@ from .recon import recon_passive, recon_active
 from .voice import get_voice
 from .vision import get_vision
 from .ml_pipeline import get_ml_pipeline
+from .automation import get_engine
