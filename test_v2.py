@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""NEXUS v2.0 — Full System Verification"""
+
+print("=" * 60)
+print("  NEXUS v2.0 — Full System Verification")
+print("=" * 60)
+
+# 1. Voice
+print("\n[1/4] Voice Module...")
+from bridge_core.voice import get_voice
+v = get_voice()
+status = v.get_status()
+print(f"  STT: {status['stt']}")
+print(f"  TTS: {status['tts']}")
+print(f"  Language: {status['language']}")
+
+# Test TTS
+print("  Testing TTS...")
+result = v.speak("NEXUS voice module ready")
+print(f"  TTS Result: {result}")
+
+# 2. Vision
+print("\n[2/4] Vision Module...")
+from bridge_core.vision import get_vision
+vi = get_vision()
+vstatus = vi.get_status()
+print(f"  Tesseract: {vstatus['tesseract']}")
+print(f"  Screenshots: {vstatus['screenshots_count']}")
+
+# 3. ML Pipeline
+print("\n[3/4] ML Pipeline...")
+from bridge_core.ml_pipeline import get_ml_pipeline
+import numpy as np
+ml = get_ml_pipeline()
+print(f"  Models: {ml.get_status()['total_models']}")
+
+# Quick train test
+X = np.random.rand(50, 4)
+y = (X[:, 0] + X[:, 1] > 1).astype(int)
+result = ml.train_classifier(X, y, model_type="random_forest")
+print(f"  Train accuracy: {result.get('accuracy', 'N/A')}")
+
+# 4. All MCP Servers
+print("\n[4/4] MCP Servers...")
+import subprocess, sys
+servers = [
+    ("nexus-brain", "mcp_servers/llm_fallback.py"),
+    ("nexus-memory", "mcp_servers/memory_mcp.py"),
+    ("nexus-router", "mcp_servers/task_router_mcp.py"),
+    ("nexus-security", "mcp_servers/pentest_mcp.py"),
+    ("nexus-orchestrator", "mcp_servers/nexus_orchestrator_mcp.py"),
+    ("nexus-voice", "mcp_servers/voice_mcp.py"),
+    ("nexus-vision", "mcp_servers/vision_mcp.py"),
+    ("nexus-ml", "mcp_servers/ml_mcp.py"),
+]
+init_req = '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
+ok = 0
+for name, script in servers:
+    try:
+        r = subprocess.run([sys.executable, script], input=init_req, capture_output=True, text=True, timeout=5)
+        if name in r.stdout:
+            print(f"  {name}: OK")
+            ok += 1
+        else:
+            print(f"  {name}: FAIL")
+    except Exception as e:
+        print(f"  {name}: ERROR - {e}")
+
+print(f"\n{'=' * 60}")
+print(f"  RESULT: {ok}/8 MCP servers OK")
+print(f"  Voice: {status['stt']} / {status['tts']}")
+print(f"  Tesseract: {vstatus['tesseract']}")
+print(f"  Models trained: {len(ml.list_models())}")
+print(f"{'=' * 60}")
