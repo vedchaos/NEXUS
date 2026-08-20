@@ -5,14 +5,16 @@
 [![GitHub issues](https://img.shields.io/github/issues/vedchaos/chaos-type-zero?style=flat-square&color=ff4444)](https://github.com/vedchaos/chaos-type-zero/issues)
 [![GitHub license](https://img.shields.io/github/license/vedchaos/chaos-type-zero?style=flat-square&color=00ff41)](https://github.com/vedchaos/chaos-type-zero/blob/main/LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10+-blue?style=flat-square)](https://www.python.org/)
-[![MCP](https://img.shields.io/badge/MCP-40-orange?style=flat-square)](https://modelcontextprotocol.io/)
-[![Tools](https://img.shields.io/badge/Tools-298-green?style=flat-square)]()
+[![MCP](https://img.shields.io/badge/MCP-42-orange?style=flat-square)](https://modelcontextprotocol.io/)
+[![Tools](https://img.shields.io/badge/Tools-316-green?style=flat-square)]()
 [![Providers](https://img.shields.io/badge/Providers-14-purple?style=flat-square)]()
 [![Skills](https://img.shields.io/badge/Skills-31-cyan?style=flat-square)]()
+[![Tests](https://img.shields.io/badge/Tests-88%20passed-brightgreen?style=flat-square)]()
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](https://github.com/vedchaos/chaos-type-zero/blob/main/LICENSE)
 
 > **C**omprehensive **H**ybrid **A**utonomous **O**perating **S**ystem — **Type Zero**
 
-An autonomous AI operating system for independent developers, security researchers, and ML engineers. **40 MCP servers, 298 tools, 14 LLM providers, 31 skills** — self-healing, multi-provider, memory-aware, with full automation.
+An autonomous AI operating system for independent developers, security researchers, and ML engineers. **42 MCP servers, 316 tools, 14 LLM providers, 31 skills** — self-healing, multi-provider, memory-aware, with full automation.
 
 ---
 
@@ -24,8 +26,8 @@ CHAOS TYPE ZERO (CTZ) is a personal AI agent that thinks, remembers, automates, 
 
 | Feature | What it does |
 |---------|-------------|
-| **40 MCP Servers** | Brain, Memory, Router, Security, Voice, Vision, ML, Browser, Comms, Neural, NSE, CI/CD, DB, Game AI, Image Gen, Knowledge Graph, i18n, Plugin, and more |
-| **298 Tools** | Every tool you need — from web scraping to security scanning to image generation |
+| **42 MCP Servers** | Brain, Memory, Router, Security, Voice, Vision, ML, Browser, Comms, Neural, NSE, CI/CD, DB, Game AI, Image Gen, Knowledge Graph, i18n, Plugin, Playwright, Real Security, and more |
+| **316 Tools** | Every tool you need — from web scraping to real Nmap/Nuclei scanning to image generation |
 | **14 LLM Providers** | Free-first with auto-fallback — Ollama, Groq, Gemini, Anthropic, OpenAI, and more |
 | **3-Tier Memory** | RAM (instant) → SQLite (structured) → ChromaDB (semantic search) |
 | **6-Agent Orchestrator** | Plan → Execute → Critique → Refine → Memory → Report |
@@ -33,11 +35,11 @@ CHAOS TYPE ZERO (CTZ) is a personal AI agent that thinks, remembers, automates, 
 | **Heuristics Engine** | Risk assessment, cost estimation, pattern learning, decision caching |
 | **Meta-Reasoner** | Intelligent task routing, adaptive strategy selection |
 | **Automation Engine** | Triggers, actions, presets — backup, monitor, report, health check |
-| **Security Module** | NSE-style scanning, Kali Linux tools via WSL2 |
+| **Security Module** | Real Nmap/Nuclei scanning via WSL2, NSE-style scripts, Kali tools |
 | **ML Pipeline** | Train, evaluate, deploy models locally with scikit-learn |
 | **Neural Network** | Text classification, summarization, embeddings — no heavy deps |
 | **Voice & Vision** | Whisper STT, pyttsx3 TTS, Tesseract OCR, screenshot analysis |
-| **Browser Automation** | Web scraping, navigation, form filling, screenshots |
+| **Browser Automation** | Playwright real browser + web scraping, navigation, form filling |
 | **Communications** | Email, Slack, Discord, Telegram, webhooks |
 | **Knowledge Graph** | Entity-relationship mapping with BFS pathfinding |
 | **Image Generation** | HuggingFace API, ASCII art, memes |
@@ -45,6 +47,9 @@ CHAOS TYPE ZERO (CTZ) is a personal AI agent that thinks, remembers, automates, 
 | **Plugin Marketplace** | Search, install, enable, rate plugins |
 | **Docker Deployment** | Containerized with docker-compose |
 | **Dashboard** | Cyberpunk web UI with Chart.js, WebSocket, real-time charts |
+| **Mobile App** | React Native control center — chat, status, MCP servers |
+| **Slack Bot** | Control CTZ from Slack — scan, search, run tasks |
+| **Discord Bot** | Control CTZ from Discord — rich embeds, commands |
 
 ---
 
@@ -63,11 +68,12 @@ chmod +x install.sh && ./install.sh
 
 # Or manual install
 pip install -r requirements.txt
-cp config/.env.example config/.env
-notepad config/.env
 
-# Run tests
-python test_ctz.py
+# Run all tests (88 tests)
+python -m pytest tests/ -v
+
+# Run MCP server tests
+python tests/test_all_mcps.py
 
 # Start dashboard
 python dashboard/server.py
@@ -104,16 +110,16 @@ CHAOS TYPE ZERO/
 │   ├── meta_reasoner.py            ← Intelligent routing
 │   ├── neural.py                   ← TF-IDF, classification
 │   └── voice_enhanced.py           ← Wake word, command parsing
-├── mcp_servers/                     ← 40 MCP tool servers
-│   ├── llm_fallback.py            ← Brain (2 tools)
-│   ├── memory_mcp.py              ← Memory (2 tools)
-│   ├── task_router_mcp.py         ← Router (1 tool)
-│   ├── pentest_mcp.py             ← Security (5 tools)
+├── mcp_servers/                     ← 42 MCP tool servers
+│   ├── llm_fallback.py            ← Brain (3 tools)
+│   ├── memory_mcp.py              ← Memory (3 tools)
+│   ├── task_router_mcp.py         ← Router (4 tools)
+│   ├── pentest_mcp.py             ← Security (7 tools)
 │   ├── ctz_orchestrator_mcp.py    ← Orchestrator (8 tools)
 │   ├── voice_mcp.py               ← Voice (5 tools)
 │   ├── vision_mcp.py              ← Vision (6 tools)
-│   ├── ml_mcp.py                  ← ML (3 tools)
-│   ├── automation_mcp.py          ← Automation (10 tools)
+│   ├── ml_mcp.py                  ← ML (5 tools)
+│   ├── automation_mcp.py          ← Automation (4 tools)
 │   ├── context_bridge_mcp.py      ← Context (12 tools)
 │   ├── cache_mcp.py               ← Cache (6 tools)
 │   ├── vault_mcp.py               ← Vault (5 tools)
@@ -130,21 +136,39 @@ CHAOS TYPE ZERO/
 │   ├── deploy_mcp.py              ← Deploy (3 tools)
 │   ├── report_mcp.py              ← Reports (3 tools)
 │   ├── translate_mcp.py           ← Translate (2 tools)
-│   ├── status_mcp.py              ← Status (4 tools)
+│   ├── status_mcp.py              ← Status (3 tools)
 │   ├── health_mcp.py              ← Health (3 tools)
 │   ├── data_mcp.py                ← Data (4 tools)
-│   ├── unified_control_mcp.py     ← Control (5 tools)
-│   ├── browser_mcp.py             ← Browser (10 tools) 🆕
-│   ├── comms_mcp.py               ← Communications (9 tools) 🆕
-│   ├── neural_mcp.py              ← Neural (6 tools) 🆕
-│   ├── nse_mcp.py                 ← NSE Security (6 tools) 🆕
-│   ├── cicd_mcp.py                ← CI/CD (7 tools) 🆕
-│   ├── db_multi_mcp.py            ← Multi-DB (8 tools) 🆕
-│   ├── game_ai_mcp.py             ← Game AI (6 tools) 🆕
-│   ├── image_gen_mcp.py           ← Image Gen (7 tools) 🆕
-│   ├── knowledge_graph_mcp.py     ← Knowledge Graph (8 tools) 🆕
-│   ├── i18n_mcp.py                ← Multi-Language (6 tools) 🆕
-│   └── plugin_mcp.py              ← Plugin Market (8 tools) 🆕
+│   ├── unified_control_mcp.py     ← Control (4 tools)
+│   ├── browser_mcp.py             ← Browser (10 tools)
+│   ├── comms_mcp.py               ← Communications (9 tools)
+│   ├── neural_mcp.py              ← Neural (6 tools)
+│   ├── nse_mcp.py                 ← NSE Security (6 tools)
+│   ├── cicd_mcp.py                ← CI/CD (7 tools)
+│   ├── db_multi_mcp.py            ← Multi-DB (8 tools)
+│   ├── game_ai_mcp.py             ← Game AI (6 tools)
+│   ├── image_gen_mcp.py           ← Image Gen (7 tools)
+│   ├── knowledge_graph_mcp.py     ← Knowledge Graph (8 tools)
+│   ├── i18n_mcp.py                ← Multi-Language (6 tools)
+│   ├── plugin_mcp.py              ← Plugin Market (8 tools)
+│   ├── playwright_mcp.py          ← Playwright Browser (10 tools) NEW
+│   ├── real_security_mcp.py       ← Nmap/Nuclei Real (8 tools) NEW
+│   ├── slack_bot.py               ← Slack Bot Controller NEW
+│   └── discord_bot.py             ← Discord Bot Controller NEW
+├── mobile/                          ← React Native Mobile App NEW
+│   ├── App.js                     ← Dashboard, Chat, MCP, Settings
+│   ├── package.json               ← Expo dependencies
+│   └── app.json                   ← App config
+├── tests/                           ← Unit tests (88 tests) NEW
+│   ├── test_smart_brain.py         ← 7 tests
+│   ├── test_memory_3tier.py        ← 7 tests
+│   ├── test_heuristics.py          ← 6 tests
+│   ├── test_meta_reasoner.py       ← 5 tests
+│   ├── test_neural.py              ← 6 tests
+│   ├── test_task_classifier.py     ← 9 tests
+│   ├── test_dashboard.py           ← 4 tests
+│   ├── test_all_mcps.py            ← 42 MCP server tests
+│   └── conftest.py                 ← Pytest config
 ├── .opencode/                       ← OpenCode integration
 │   ├── agent/ctz.md               ← Agent identity
 │   └── skills/                    ← 31 skill modules
@@ -163,8 +187,14 @@ CHAOS TYPE ZERO/
 ├── install.ps1                      ← Windows installer
 ├── install.sh                       ← Linux/Mac installer
 ├── setup_kali.sh                    ← Kali WSL2 setup
-├── opencode.json                    ← Config (6 agents, 40 MCPs)
-└── requirements.txt                 ← Dependencies (lean)
+├── opencode.json                    ← Config (6 agents, 42 MCPs)
+├── requirements.txt                 ← Dependencies
+├── pytest.ini                       ← Test configuration
+├── CONTRIBUTING.md                  ← Contributing guide
+├── LICENSE                          ← MIT License
+├── COMPARISON.md                    ← v1.0 vs v3.0 comparison
+├── UPGRADE_DOCS.md                  ← Full upgrade documentation
+└── UPGRADE_ROADMAP.md               ← Feature roadmap
 ```
 
 ---
@@ -240,20 +270,20 @@ Tier 3: ChromaDB (~50ms)
 
 ---
 
-## MCP Servers (40)
+## MCP Servers (42)
 
 ### Core Servers
 | Server | Tools | Description |
 |--------|-------|-------------|
-| ctz-brain | 2 | LLM fallback with 14 providers |
-| ctz-memory | 2 | 3-tier memory operations |
-| ctz-router | 1 | Task routing and classification |
+| ctz-brain | 3 | LLM fallback with 14 providers |
+| ctz-memory | 3 | 3-tier memory operations |
+| ctz-router | 4 | Task routing and classification |
 | ctz-security | 5 | Security scanning (Nmap, Nuclei, Nikto) |
 | ctz-orchestrator | 8 | Sisyphus loop orchestration |
 | ctz-voice | 5 | Whisper STT + pyttsx3 TTS |
 | ctz-vision | 6 | Screenshot + OCR + analysis |
-| ctz-ml | 3 | scikit-learn ML pipelines |
-| ctz-automation | 10 | Triggers, actions, presets |
+| ctz-ml | 5 | scikit-learn ML pipelines |
+| ctz-automation | 4 | Triggers, actions, presets |
 
 ### Infrastructure Servers
 | Server | Tools | Description |
@@ -274,35 +304,43 @@ Tier 3: ChromaDB (~50ms)
 | ctz-deploy | 3 | Deployment checks |
 | ctz-report | 3 | System reports |
 | ctz-translate | 2 | Text translation |
-| ctz-status | 4 | Live status |
+| ctz-status | 3 | Live status |
 | ctz-health | 3 | Health monitoring |
 | ctz-data | 4 | CSV/JSON analysis |
-| ctz-control | 5 | Central orchestration |
+| ctz-control | 4 | Central orchestration |
 
-### Tier 1 Upgrades (New)
+### Tier 1 Upgrades
 | Server | Tools | Description |
 |--------|-------|-------------|
-| ctz-browser | 10 | Web scraping, navigation, screenshots 🆕 |
-| ctz-comms | 9 | Email, Slack, Discord, Telegram 🆕 |
-| ctz-neural | 6 | Text classification, embeddings 🆕 |
+| ctz-browser | 10 | Web scraping, navigation, screenshots |
+| ctz-comms | 9 | Email, Slack, Discord, Telegram |
+| ctz-neural | 6 | Text classification, embeddings |
 
-### Tier 2 Upgrades (New)
+### Tier 2 Upgrades
 | Server | Tools | Description |
 |--------|-------|-------------|
-| ctz-nse | 6 | NSE-style security scanning 🆕 |
-| ctz-cicd | 7 | GitHub Actions, GitLab CI, Jenkins 🆕 |
-| ctz-db-multi | 8 | PostgreSQL, MongoDB, Redis 🆕 |
-| ctz-game-ai | 6 | Game strategy, stats, training 🆕 |
+| ctz-nse | 6 | NSE-style security scanning |
+| ctz-cicd | 7 | GitHub Actions, GitLab CI, Jenkins |
+| ctz-db-multi | 8 | PostgreSQL, MongoDB, Redis |
+| ctz-game-ai | 6 | Game strategy, stats, training |
 
-### Tier 3 Upgrades (New)
+### Tier 3 Upgrades
 | Server | Tools | Description |
 |--------|-------|-------------|
-| ctz-image-gen | 7 | HuggingFace API, ASCII art, memes 🆕 |
-| ctz-knowledge-graph | 8 | Entity-relationship mapping 🆕 |
-| ctz-i18n | 6 | 28 languages, locale formatting 🆕 |
-| ctz-plugin | 8 | Plugin marketplace 🆕 |
+| ctz-image-gen | 7 | HuggingFace API, ASCII art, memes |
+| ctz-knowledge-graph | 8 | Entity-relationship mapping |
+| ctz-i18n | 6 | 28 languages, locale formatting |
+| ctz-plugin | 8 | Plugin marketplace |
 
-**Total: 40 servers, 298 tools**
+### NEW — Priority 2 Upgrades
+| Server | Tools | Description |
+|--------|-------|-------------|
+| ctz-playwright | 10 | Real Playwright browser automation |
+| ctz-real-security | 8 | Real Nmap/Nuclei via WSL2 |
+| slack_bot | — | Slack Bot Controller |
+| discord_bot | — | Discord Bot Controller |
+
+**Total: 42 servers, 316 tools**
 
 ---
 
@@ -350,6 +388,144 @@ python dashboard/server.py
 
 ---
 
+## Mobile App (React Native)
+
+Phone se CTZ control karo!
+
+### Features
+- **Dashboard**: System stats, quick actions
+- **Chat**: Direct command interface
+- **MCP Servers**: 42 servers ka status
+- **Settings**: API URL, auth token config
+
+### Setup
+```bash
+cd mobile
+npm install
+npx expo start
+```
+
+### Connect
+1. Dashboard server chalao (port 8080)
+2. Mobile API chalao (port 8081)
+3. Phone aur PC same WiFi pe
+4. Settings mein PC ka IP dalo
+5. Connect!
+
+---
+
+## Slack Bot
+
+Slack se directly CTZ control karo!
+
+### Commands
+```
+!scan <target>     — Security scan
+!search <query>    — Search memory
+!run <task>        — Run task
+!browse <url>      — Browse website
+!status            — System status
+!health            — Health check
+!servers           — MCP servers
+!help              — Show commands
+```
+
+### Setup
+```bash
+# Set environment variables
+export SLACK_BOT_TOKEN=xoxb-YOUR-TOKEN
+export SLACK_SIGNING_SECRET=YOUR-SECRET
+
+# Run bot
+python mcp_servers/slack_bot.py
+```
+
+---
+
+## Discord Bot
+
+Discord server pe CTZ control karo!
+
+### Commands
+```
+!scan <target>     — Security scan
+!search <query>    — Search memory
+!run <task>        — Run task
+!browse <url>      — Browse website
+!status            — System status
+!health            — Health check
+!servers           — MCP servers
+!help              — Show commands
+```
+
+### Setup
+```bash
+# Install discord.py
+pip install discord.py
+
+# Set environment variable
+export DISCORD_BOT_TOKEN=YOUR-TOKEN
+
+# Run bot
+python mcp_servers/discord_bot.py
+```
+
+---
+
+## Real Security Scanning (Nmap/Nuclei)
+
+CTZ now supports real security scanning via WSL2!
+
+### Check Tools
+```bash
+# Check if Nmap/Nuclei are installed
+wsl -e bash -c 'which nmap; which nuclei'
+```
+
+### Install Tools
+```bash
+wsl -e bash -c 'sudo apt update && sudo apt install -y nmap'
+wsl -e bash -c 'go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest'
+```
+
+### Scan Targets
+```
+ctz_real_nmap_scan     — Full Nmap scan
+ctz_real_nmap_service  — Service/version detection
+ctz_real_nmap_os       — OS detection
+ctz_real_nuclei_scan   — Nuclei vulnerability scan
+ctz_real_combined_scan — Nmap + Nuclei combined
+ctz_real_port_scan     — Quick port scan
+```
+
+---
+
+## Playwright Browser
+
+Real browser automation with Playwright!
+
+### Install
+```bash
+pip install playwright
+playwright install chromium
+```
+
+### Tools
+```
+ctz_pw_open        — Open URL in real browser
+ctz_pw_click       — Click element by CSS selector
+ctz_pw_type        — Type text into input field
+ctz_pw_scrape      — Scrape page content
+ctz_pw_screenshot  — Take screenshot
+ctz_pw_fill_form   — Fill form fields
+ctz_pw_wait        — Wait for element
+ctz_pw_execute_js  — Execute JavaScript
+ctz_pw_navigate    — Navigate to URL
+ctz_pw_get_text    — Get text content
+```
+
+---
+
 ## Docker Deployment
 
 ```bash
@@ -365,6 +541,38 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 # Dashboard: http://localhost:8080
 # Mobile API: http://localhost:8081
 ```
+
+---
+
+## Testing
+
+### Run All Tests (88 tests)
+```bash
+# Unit tests (44 tests)
+python -m pytest tests/ -v
+
+# MCP server tests (42 servers)
+python tests/test_all_mcps.py
+
+# Specific test file
+python -m pytest tests/test_smart_brain.py -v
+
+# With coverage
+python -m pytest tests/ --cov=bridge_core
+```
+
+### Test Coverage
+| Module | Tests |
+|--------|-------|
+| smart_brain | 7 |
+| memory_3tier | 7 |
+| heuristics | 6 |
+| meta_reasoner | 5 |
+| neural | 6 |
+| task_classifier | 9 |
+| dashboard | 4 |
+| **MCP Servers** | **42** |
+| **Total** | **88** |
 
 ---
 
@@ -396,17 +604,23 @@ chmod +x setup_kali.sh
 
 | Category | v1.0 | v3.0 | Growth |
 |----------|------|------|--------|
-| MCP Servers | 9 | 40 | +344% |
-| Tools | ~30 | 298 | +893% |
+| MCP Servers | 9 | 42 | +367% |
+| Tools | ~30 | 316 | +953% |
 | Providers | 3 | 14 | +367% |
 | Agents | 2 | 6 | +200% |
 | Task Types | 4 | 12 | +200% |
 | Skills | 12 | 31 | +158% |
-| Intelligence | 3/14 | 14/14 | +367% |
-| UX | 0/5 | 5/5 | +500% |
-| **TOTAL** | **15/100** | **110/100** | **+633%** |
+| Tests | 0 | 88 | New |
+| Mobile App | No | Yes | New |
+| Real Browser | No | Yes (Playwright) | New |
+| Real Security | No | Yes (Nmap/Nuclei) | New |
+| Slack Bot | No | Yes | New |
+| Discord Bot | No | Yes | New |
+| License | No | Yes (MIT) | New |
+| Intelligence | 1/15 | 15/15 | +1400% |
+| UX | 0/6 | 6/6 | +infinity |
 
-**CTZ v3.0 is 733% more capable than v1.0.**
+**CTZ v3.0 is 800%+ more capable than v1.0.**
 
 ---
 
@@ -421,14 +635,18 @@ chmod +x setup_kali.sh
 | v2.3 | Aug 19, 2026 | Context bridge, cache, vault |
 | v2.4 | Aug 19, 2026 | 29 MCP servers, 136+ tools |
 | v2.5 | Aug 19, 2026 | 28 skills, heuristics, dashboard |
-| **v3.0** | **Aug 20, 2026** | **40 servers, 298 tools, full upgrade** |
+| v3.0 | Aug 20, 2026 | 40 servers, 298 tools, full upgrade |
+| **v3.1** | **Aug 20, 2026** | **Priority 1: badges, LICENSE, tests, CONTRIBUTING** |
+| **v3.2** | **Aug 20, 2026** | **Priority 2: Mobile app, Playwright, Nmap/Nuclei, Slack/Discord bots** |
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
 ## License
 
-Personal use. Built by Ved for Ved.
-
----
-
-*"The only way to deal with an unfree world is to become so absolutely free that your very existence is an act of rebellion." — Albert Camus*
+[MIT License](LICENSE) — Personal use. Built by Ved for Ved.

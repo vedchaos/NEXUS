@@ -32,12 +32,21 @@
 | v2.3 | Aug 19, 2026 | Context bridge, cache, vault |
 | v2.4 | Aug 19, 2026 | 29 MCP servers, 136+ tools |
 | v2.5 | Aug 19, 2026 | 28 skills, heuristics, meta-reasoner, dashboard |
-| **v3.0** | **Aug 20, 2026** | **40 MCP servers, 298 tools, full upgrade** |
+| v3.0 | Aug 20, 2026 | 40 MCP servers, 298 tools, full upgrade |
+| v3.1 | Aug 20, 2026 | Priority 1: badges, LICENSE, 88 tests, CONTRIBUTING |
+| **v3.2** | **Aug 20, 2026** | **Priority 2: Mobile app, Playwright, Nmap/Nuclei, Slack/Discord bots** |
 
 ### Before vs After
-| Component | v2.5 | v3.0 | Growth |
+| Component | v2.5 | v3.2 | Growth |
 |---|---|---|---|
-| MCP Servers | 29 | 40 | +38% |
+| MCP Servers | 29 | 42 | +45% |
+| Tools | ~140 | 316 | +126% |
+| Tests | 0 | 88 | New |
+| Mobile App | No | Yes | New |
+| Real Browser | No | Yes (Playwright) | New |
+| Real Security | No | Yes (Nmap/Nuclei) | New |
+| Slack Bot | No | Yes | New |
+| Discord Bot | No | Yes | New |
 | Tools | 136 | 298 | +119% |
 | Skills | 28 | 31 | +11% |
 | Core Modules | 16 | 18 | +13% |
