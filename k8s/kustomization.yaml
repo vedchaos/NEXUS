@@ -1,0 +1,29 @@
+# ============================================================
+# CHAOS TYPE ZERO — Kustomization
+# ============================================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: chaos-type-zero
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - deployment.yaml
+  - service.yaml
+  - pvc.yaml
+  - hpa.yaml
+  - ingress.yaml
+  - network-policy.yaml
+  - rbac.yaml
+
+commonLabels:
+  app.kubernetes.io/name: chaos-type-zero
+  app.kubernetes.io/version: "3.2"
+  app.kubernetes.io/managed-by: kustomize
+
+images:
+  - name: vedchaos/ctz
+    newTag: "3.2"
+    newName: vedchaos/ctz

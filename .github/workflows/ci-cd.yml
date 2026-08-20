@@ -1,0 +1,256 @@
+# ============================================================
+# CHAOS TYPE ZERO — CI/CD Pipeline
+# ============================================================
+name: CTZ CI/CD
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PYTHON_VERSION: "3.12"
+  CTZ_VERSION: "3.2"
+
+jobs:
+  # ============================================================
+  # LINT & FORMAT
+  # ============================================================
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Dependencies
+        run: |
+          pip install ruff black mypy
+
+      - name: Run Ruff Linter
+        run: ruff check . --output-format=github
+
+      - name: Run Black Formatter (check)
+        run: black --check .
+
+      - name: Run MyPy
+        run: mypy --ignore-missing-imports bridge_core/ mcp_servers/ || true
+
+  # ============================================================
+  # UNIT TESTS
+  # ============================================================
+  test-unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Unit Tests
+        run: pytest tests/ -v --tb=short --junitxml=test-results/unit.xml -m "not mcp_server"
+
+      - name: Upload Unit Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-results
+          path: test-results/unit.xml
+
+  # ============================================================
+  # MCP SERVER TESTS
+  # ============================================================
+  test-mcp:
+    name: MCP Server Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run MCP Tests
+        run: pytest tests/test_all_mcps.py -v --tb=short --junitxml=test-results/mcp.xml
+
+      - name: Upload MCP Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mcp-test-results
+          path: test-results/mcp.xml
+
+  # ============================================================
+  # SYNTAX CHECK
+  # ============================================================
+  syntax:
+    name: Syntax Check
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Check Python Syntax
+        run: |
+          echo "Checking all Python files..."
+          find . -name "*.py" -not -path "./.git/*" -not -path "./venv/*" | while read f; do
+            python -m py_compile "$f" || echo "SYNTAX ERROR: $f"
+          done
+          echo "✅ Syntax check complete"
+
+  # ============================================================
+  # DOCKER BUILD
+  # ============================================================
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-mcp, syntax]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            vedchaos/ctz:latest
+            vedchaos/ctz:${{ env.CTZ_VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================================
+  # DEPLOY TO STAGING
+  # ============================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [docker]
+    if: github.ref == 'refs/heads/main'
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Staging Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /opt/ctz
+            git pull
+            docker-compose pull
+            docker-compose up -d
+            echo "✅ Deployed to staging"
+
+  # ============================================================
+  # SECURITY SCAN
+  # ============================================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Run Safety Check
+        run: |
+          pip install safety
+          safety check -r requirements.txt || true
+
+      - name: Run Bandit Security Linter
+        run: |
+          pip install bandit
+          bandit -r bridge_core/ mcp_servers/ -f json -o bandit-report.json || true
+          echo "✅ Security scan complete"
+
+  # ============================================================
+  # RELEASE
+  # ============================================================
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [docker, deploy-staging]
+    if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release:')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Version
+        id: version
+        run: |
+          VERSION=$(grep -oP '"version":\s*"\K[^"]+' opencode.json || echo "3.2")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: "CHAOS TYPE ZERO v${{ steps.version.outputs.version }}"
+          body: |
+            ## CHAOS TYPE ZERO v${{ steps.version.outputs.version }}
+
+            ### What's New
+            - Priority 3: Kubernetes, Terraform, Prometheus, Grafana, CI/CD
+            - 42 MCP servers, 316 tools
+            - Full monitoring and deployment pipeline
+
+            ### Installation
+            ```bash
+            git clone https://github.com/vedchaos/chaos-type-zero.git
+            cd chaos-type-zero
+            pip install -r requirements.txt
+            python dashboard/server.py
+            ```
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

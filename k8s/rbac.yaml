@@ -1,0 +1,56 @@
+# ============================================================
+# CHAOS TYPE ZERO — RBAC
+# ============================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ctz-service-account
+  namespace: chaos-type-zero
+  labels:
+    app.kubernetes.io/name: chaos-type-zero
+    app.kubernetes.io/component: rbac
+---
+# ============================================================
+# CHAOS TYPE ZERO — Role
+# ============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ctz-role
+  namespace: chaos-type-zero
+  labels:
+    app.kubernetes.io/name: chaos-type-zero
+    app.kubernetes.io/component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch"]
+---
+# ============================================================
+# CHAOS TYPE ZERO — RoleBinding
+# ============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ctz-role-binding
+  namespace: chaos-type-zero
+  labels:
+    app.kubernetes.io/name: chaos-type-zero
+    app.kubernetes.io/component: rbac
+subjects:
+  - kind: ServiceAccount
+    name: ctz-service-account
+    namespace: chaos-type-zero
+roleRef:
+  kind: Role
+  name: ctz-role
+  apiGroup: rbac.authorization.k8s.io

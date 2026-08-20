@@ -16,6 +16,11 @@
 | Discord Bot | v1.0 | ✅ New |
 | Real Security | Nmap/Nuclei | ✅ WSL2 |
 | Real Browser | Playwright | ✅ New |
+| Kubernetes | 11 manifests | ✅ v3.3 NEW |
+| Terraform | AWS IaC | ✅ v3.3 NEW |
+| Prometheus | /metrics | ✅ v3.3 NEW |
+| Grafana | Dashboard | ✅ v3.3 NEW |
+| CI/CD | GitHub Actions | ✅ v3.3 NEW |
 
 ---
 
@@ -89,6 +94,56 @@ Task → Complexity Scoring → Generate 5 Strategies → Score Each
 ```
 Startup → Integrity Check All DBs → Auto-Repair Corruption
   → Deduplicate → VACUUM → Health Score → Ready
+```
+
+### Flow 11: Kubernetes Deployment Flow (NEW)
+```
+kubectl apply -f k8s/
+  → Namespace created
+  → ConfigMap + Secrets applied
+  → Deployments rolling update (2 dashboard + 3 MCP pods)
+  → Services exposed (LoadBalancer + ClusterIP)
+  → HPA auto-scaling active (2-20 pods)
+  → Ingress + TLS configured
+  → NetworkPolicy enforced
+  → RBAC service account ready
+```
+
+### Flow 12: Terraform AWS Deployment Flow (NEW)
+```
+terraform apply
+  → VPC + Subnet + Internet Gateway
+  → Security Group (ports 22, 8080, 8081, 9090, 3000, 3001)
+  → EC2 Instance (Ubuntu 22.04, 50GB root + 100GB data)
+  → S3 Bucket (backups with versioning)
+  → CloudWatch Alarm (CPU > 80%)
+  → User Data bootstraps CTZ
+  → Dashboard live at http://<IP>:8080
+```
+
+### Flow 13: Prometheus Monitoring Flow (NEW)
+```
+metrics_server.py → Collects system metrics every 5s
+  → CPU, Memory, Disk, Uptime
+  → Request counters, MCP call counters
+  → Task completion counters
+  → Cache hit/miss ratios
+  → HTTP /metrics endpoint
+  → Prometheus scrapes every 15s
+  → Grafana renders dashboards
+```
+
+### Flow 14: CI/CD Pipeline Flow (NEW)
+```
+Push to main/dev
+  → Lint (Ruff + Black + MyPy)
+  → Unit Tests (44 tests)
+  → MCP Tests (42 servers)
+  → Syntax Check (all .py files)
+  → Docker Build + Push (main only)
+  → Deploy to Staging (SSH)
+  → Security Scan (Safety + Bandit)
+  → Create Release (if commit contains "release:")
 ```
 
 ---

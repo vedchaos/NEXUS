@@ -1,0 +1,16 @@
+# ============================================================
+# CHAOS TYPE ZERO — Grafana Dashboard Provisioning
+# ============================================================
+apiVersion: 1
+
+providers:
+  - name: 'CTZ Dashboards'
+    orgId: 1
+    folder: 'CTZ'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

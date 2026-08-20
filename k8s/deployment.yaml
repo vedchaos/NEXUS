@@ -1,0 +1,119 @@
+# ============================================================
+# CHAOS TYPE ZERO — Deployment
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctz-dashboard
+  namespace: chaos-type-zero
+  labels:
+    app.kubernetes.io/name: chaos-type-zero
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/version: "3.2"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ctz-dashboard
+  template:
+    metadata:
+      labels:
+        app: ctz-dashboard
+        app.kubernetes.io/name: chaos-type-zero
+        app.kubernetes.io/component: dashboard
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      containers:
+        - name: ctz-dashboard
+          image: vedchaos/ctz:latest
+          ports:
+            - containerPort: 8080
+              name: dashboard
+            - containerPort: 8081
+              name: api
+            - containerPort: 9090
+              name: metrics
+          envFrom:
+            - configMapRef:
+                name: ctz-config
+            - secretRef:
+                name: ctz-secrets
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: ctz-data
+              mountPath: /app/data
+            - name: ctz-memory
+              mountPath: /app/memory
+      volumes:
+        - name: ctz-data
+          persistentVolumeClaim:
+            claimName: ctz-data-pvc
+        - name: ctz-memory
+          persistentVolumeClaim:
+            claimName: ctz-memory-pvc
+      restartPolicy: Always
+---
+# ============================================================
+# CHAOS TYPE ZERO — MCP Workers Deployment
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctz-mcp-workers
+  namespace: chaos-type-zero
+  labels:
+    app.kubernetes.io/name: chaos-type-zero
+    app.kubernetes.io/component: mcp-workers
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ctz-mcp-workers
+  template:
+    metadata:
+      labels:
+        app: ctz-mcp-workers
+        app.kubernetes.io/name: chaos-type-zero
+        app.kubernetes.io/component: mcp-workers
+    spec:
+      containers:
+        - name: ctz-mcp
+          image: vedchaos/ctz:latest
+          command: ["python", "-m", "bridge_core.smart_brain"]
+          envFrom:
+            - configMapRef:
+                name: ctz-config
+            - secretRef:
+                name: ctz-secrets
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      restartPolicy: Always

@@ -1,0 +1,37 @@
+# ============================================================
+# CHAOS TYPE ZERO — PersistentVolumeClaims
+# ============================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ctz-data-pvc
+  namespace: chaos-type-zero
+  labels:
+    app.kubernetes.io/name: chaos-type-zero
+    app.kubernetes.io/component: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+---
+# ============================================================
+# CHAOS TYPE ZERO — Memory PVC
+# ============================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ctz-memory-pvc
+  namespace: chaos-type-zero
+  labels:
+    app.kubernetes.io/name: chaos-type-zero
+    app.kubernetes.io/component: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: standard

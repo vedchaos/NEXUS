@@ -180,6 +180,30 @@ CHAOS TYPE ZERO/
 │   ├── Dockerfile                 ← Python 3.12 slim
 │   ├── docker-compose.yml         ← Production (3 services)
 │   └── docker-compose.dev.yml     ← Development (hot reload)
+├── k8s/                             ← Kubernetes manifests NEW
+│   ├── namespace.yaml             ← CTZ namespace
+│   ├── configmap.yaml             ← Configuration
+│   ├── secrets.yaml               ← Secrets (API keys)
+│   ├── deployment.yaml            ← Dashboard + MCP Workers
+│   ├── service.yaml               ← LoadBalancer + ClusterIP
+│   ├── pvc.yaml                   ← Persistent volumes
+│   ├── hpa.yaml                   ← Auto-scaling (2-20 pods)
+│   ├── ingress.yaml               ← NGINX ingress + TLS
+│   ├── network-policy.yaml        ← Network rules
+│   ├── rbac.yaml                  ← ServiceAccount + Role
+│   └── kustomization.yaml         ← Kustomize config
+├── terraform/                       ← Infrastructure as Code NEW
+│   ├── main.tf                    ← AWS VPC, EC2, S3, CloudWatch
+│   ├── variables.tf               ← Input variables
+│   ├── outputs.tf                 ← Outputs (IPs, URLs)
+│   ├── terraform.tfvars.example   ← Example config
+│   └── modules/ctz/user_data.sh   ← EC2 bootstrap script
+├── grafana/                         ← Monitoring dashboards NEW
+│   ├── ctz-dashboard.json         ← Pre-built Grafana dashboard
+│   ├── datasource.yml             ← Prometheus datasource
+│   └── dashboard.yml              ← Dashboard provisioning
+├── bridge_core/prometheus_metrics.py ← /metrics endpoint NEW
+├── .github/workflows/ci-cd.yml    ← CI/CD pipeline NEW
 ├── config/
 │   ├── .env.example               ← API key template
 │   └── .env                       ← Your keys (gitignored)
@@ -544,6 +568,147 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 ---
 
+## Kubernetes Deployment
+
+```bash
+# Apply all manifests
+kubectl apply -f k8s/
+
+# Or use Kustomize
+kubectl apply -k k8s/
+
+# Check status
+kubectl get pods -n chaos-type-zero
+kubectl get services -n chaos-type-zero
+
+# View logs
+kubectl logs -f deployment/ctz-dashboard -n chaos-type-zero
+
+# Scale
+kubectl scale deployment/ctz-dashboard --replicas=5 -n chaos-type-zero
+```
+
+### K8s Resources Created
+- **Namespace**: `chaos-type-zero`
+- **Deployment**: Dashboard (2 replicas) + MCP Workers (3 replicas)
+- **Service**: LoadBalancer (dashboard, API, metrics)
+- **HPA**: Auto-scale 2-10 pods (dashboard), 3-20 pods (MCP)
+- **PVC**: 10Gi data + 5Gi memory
+- **Ingress**: NGINX with TLS (cert-manager)
+- **NetworkPolicy**: Restrictive ingress/egress rules
+- **RBAC**: ServiceAccount + Role + RoleBinding
+
+---
+
+## Terraform (AWS)
+
+```bash
+cd terraform
+
+# Copy variables
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your values
+
+# Initialize
+terraform init
+
+# Plan
+terraform plan
+
+# Apply
+terraform apply
+
+# Output
+terraform output
+```
+
+### AWS Resources Created
+- **VPC**: Custom VPC with public subnet
+- **EC2**: Ubuntu 22.04 with 50GB gp3 root + 100GB data
+- **S3**: Backup bucket with versioning
+- **CloudWatch**: CPU alarm > 80%
+- **Security Group**: Dashboard (8080), API (8081), Prometheus (9090), SSH (22)
+
+---
+
+## Prometheus Metrics
+
+```bash
+# Start metrics server
+python bridge_core/prometheus_metrics.py
+
+# Metrics endpoint
+curl http://localhost:9090/metrics
+
+# Health check
+curl http://localhost:9090/health
+```
+
+### Metrics Exposed
+| Metric | Type | Description |
+|--------|------|-------------|
+| ctz_cpu_percent | Gauge | CPU usage % |
+| ctz_memory_percent | Gauge | Memory usage % |
+| ctz_uptime_seconds | Gauge | Server uptime |
+| ctz_requests_total | Counter | Total requests |
+| ctz_mcp_calls_total | Counter | MCP server calls |
+| ctz_mcp_errors_total | Counter | MCP errors |
+| ctz_tasks_completed_total | Counter | Tasks completed |
+| ctz_memory_hits_total | Counter | Cache hits |
+| ctz_security_scans_total | Counter | Security scans |
+| ctz_request_duration_seconds | Histogram | Request latency |
+| ctz_llm_response_time_seconds | Histogram | LLM response time |
+
+---
+
+## Grafana Dashboard
+
+```bash
+# Start Grafana (Docker)
+docker run -d -p 3001:3000 \
+  -v $(pwd)/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml \
+  -v $(pwd)/grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml \
+  -v $(pwd)/grafana/ctz-dashboard.json:/var/lib/grafana/dashboards/ctz-dashboard.json \
+  grafana/grafana:latest
+
+# Access: http://localhost:3001
+# Login: admin / admin
+```
+
+### Dashboard Panels
+- CPU, Memory, Disk usage (stat + timeseries)
+- Request rate and duration (P50/P95)
+- MCP calls and errors
+- Cache hit rate
+- Security scan count
+- LLM response time
+
+---
+
+## CI/CD (GitHub Actions)
+
+Pipeline runs on push to `main` or `dev`:
+
+1. **Lint** — Ruff, Black, MyPy
+2. **Unit Tests** — 44 tests with pytest
+3. **MCP Tests** — 42 MCP server tests
+4. **Syntax Check** — All Python files
+5. **Docker Build** — Build and push to Docker Hub
+6. **Deploy Staging** — SSH deploy to staging server
+7. **Security Scan** — Safety + Bandit
+8. **Release** — Auto-create GitHub release
+
+### Required Secrets
+```
+DOCKERHUB_USERNAME
+DOCKERHUB_TOKEN
+STAGING_HOST
+STAGING_USER
+STAGING_SSH_KEY
+```
+
+---
+
 ## Testing
 
 ### Run All Tests (88 tests)
@@ -638,6 +803,7 @@ chmod +x setup_kali.sh
 | v3.0 | Aug 20, 2026 | 40 servers, 298 tools, full upgrade |
 | **v3.1** | **Aug 20, 2026** | **Priority 1: badges, LICENSE, tests, CONTRIBUTING** |
 | **v3.2** | **Aug 20, 2026** | **Priority 2: Mobile app, Playwright, Nmap/Nuclei, Slack/Discord bots** |
+| **v3.3** | **Aug 20, 2026** | **Priority 3: Kubernetes, Terraform, Prometheus, Grafana, CI/CD** |
 
 ---
 
