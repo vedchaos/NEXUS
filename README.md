@@ -14,7 +14,7 @@
 
 > **C**omprehensive **H**ybrid **A**utonomous **O**perating **S**ystem — **Type Zero**
 
-An autonomous AI operating system for independent developers, security researchers, and ML engineers. **42 MCP servers, 316 tools, 14 LLM providers, 31 skills** — self-healing, multi-provider, memory-aware, with full automation.
+An autonomous AI operating system for independent developers, security researchers, and ML engineers. **42 MCP servers, 316 tools, 14 LLM providers, 31 skills, Kubernetes, Terraform, Prometheus, Grafana, CI/CD** — self-healing, multi-provider, memory-aware, with full automation.
 
 ---
 
@@ -50,6 +50,11 @@ CHAOS TYPE ZERO (CTZ) is a personal AI agent that thinks, remembers, automates, 
 | **Mobile App** | React Native control center — chat, status, MCP servers |
 | **Slack Bot** | Control CTZ from Slack — scan, search, run tasks |
 | **Discord Bot** | Control CTZ from Discord — rich embeds, commands |
+| **Kubernetes** | 11 manifests — namespace, deployment, service, HPA, ingress, RBAC, network policy |
+| **Terraform** | AWS IaC — VPC, EC2, S3, CloudWatch, auto-bootstrap |
+| **Prometheus** | `/metrics` endpoint — CPU, RAM, requests, MCP calls, histograms |
+| **Grafana** | 14-panel monitoring dashboard — system, performance, errors |
+| **CI/CD** | GitHub Actions — lint, test, build, deploy, security scan, release |
 
 ---
 
