@@ -1,5 +1,15 @@
 # 🔥 CHAOS TYPE ZERO
 
+[![GitHub stars](https://img.shields.io/github/stars/vedchaos/chaos-type-zero?style=flat-square&color=00ff41)](https://github.com/vedchaos/chaos-type-zero/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/vedchaos/chaos-type-zero?style=flat-square&color=00ff41)](https://github.com/vedchaos/chaos-type-zero/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/vedchaos/chaos-type-zero?style=flat-square&color=ff4444)](https://github.com/vedchaos/chaos-type-zero/issues)
+[![GitHub license](https://img.shields.io/github/license/vedchaos/chaos-type-zero?style=flat-square&color=00ff41)](https://github.com/vedchaos/chaos-type-zero/blob/main/LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10+-blue?style=flat-square)](https://www.python.org/)
+[![MCP](https://img.shields.io/badge/MCP-40-orange?style=flat-square)](https://modelcontextprotocol.io/)
+[![Tools](https://img.shields.io/badge/Tools-298-green?style=flat-square)]()
+[![Providers](https://img.shields.io/badge/Providers-14-purple?style=flat-square)]()
+[![Skills](https://img.shields.io/badge/Skills-31-cyan?style=flat-square)]()
+
 > **C**omprehensive **H**ybrid **A**utonomous **O**perating **S**ystem — **Type Zero**
 
 An autonomous AI operating system for independent developers, security researchers, and ML engineers. **40 MCP servers, 298 tools, 14 LLM providers, 31 skills** — self-healing, multi-provider, memory-aware, with full automation.
