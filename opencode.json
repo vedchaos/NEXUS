@@ -385,6 +385,20 @@
         "mcp_servers/real_security_mcp.py"
       ],
       "args": []
+    },
+    "ctz-discord": {
+      "command": "python",
+      "cwd": ".",
+      "env": {},
+      "tools": ["mcp_servers/discord_bot.py"],
+      "args": []
+    },
+    "ctz-slack": {
+      "command": "python",
+      "cwd": ".",
+      "env": {},
+      "tools": ["mcp_servers/slack_bot.py"],
+      "args": []
     }
   },
   "permission": {

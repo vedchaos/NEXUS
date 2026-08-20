@@ -1,4 +1,4 @@
-"""Comprehensive MCP Server Test — All 40 Servers."""
+"""Comprehensive MCP Server Test — All 44 Servers."""
 import sys
 import os
 import importlib
@@ -6,7 +6,7 @@ import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# All 40 MCP servers
+# All 44 MCP servers
 MCP_SERVERS = [
     "api_mcp",
     "automation_mcp",
@@ -48,6 +48,10 @@ MCP_SERVERS = [
     "vision_mcp",
     "voice_mcp",
     "web_mcp",
+    "discord_bot",
+    "playwright_mcp",
+    "real_security_mcp",
+    "slack_bot",
 ]
 
 results = {"passed": [], "failed": [], "errors": []}

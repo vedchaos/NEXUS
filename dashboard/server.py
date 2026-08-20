@@ -510,6 +510,7 @@ def mock_servers_data():
 class CTZHandler(http.server.BaseHTTPRequestHandler):
     """HTTP + WebSocket handler for the CTZ dashboard v2."""
 
+    # Suppress default logging for cleaner output
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -611,7 +612,7 @@ def main():
     port = int(sys.argv[1]) if len(sys.argv) > 1 else PORT
 
     try:
-        server = http.server.HTTPServer(('0.0.0.0', port), CTZHandler)
+        server = http.server.ThreadingHTTPServer(('0.0.0.0', port), CTZHandler)
     except OSError as e:
         print(f"\033[91m[ERROR]\033[0m Port {port} unavailable: {e}")
         sys.exit(1)
