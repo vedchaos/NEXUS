@@ -104,6 +104,11 @@
       "command": ["python", "mcp_servers/cache_mcp.py"],
       "enabled": true
     },
+    "ctz-game-ai": {
+      "type": "local",
+      "command": ["python", "mcp_servers/game_ai_mcp.py"],
+      "enabled": true
+    },
     "ctz-vault": {
       "type": "local",
       "command": ["python", "mcp_servers/vault_mcp.py"],
@@ -192,6 +197,56 @@
     "ctz-control": {
       "type": "local",
       "command": ["python", "mcp_servers/unified_control_mcp.py"],
+      "enabled": true
+    },
+    "ctz-browser": {
+      "type": "local",
+      "command": ["python", "mcp_servers/browser_mcp.py"],
+      "enabled": true
+    },
+    "ctz-neural": {
+      "type": "local",
+      "command": ["python", "mcp_servers/neural_mcp.py"],
+      "enabled": true
+    },
+    "ctz-comms": {
+      "type": "local",
+      "command": ["python", "mcp_servers/comms_mcp.py"],
+      "enabled": true
+    },
+    "ctz-nse": {
+      "type": "local",
+      "command": ["python", "mcp_servers/nse_mcp.py"],
+      "enabled": true
+    },
+    "ctz-cicd": {
+      "type": "local",
+      "command": ["python", "mcp_servers/cicd_mcp.py"],
+      "enabled": true
+    },
+    "ctz-db-multi": {
+      "type": "local",
+      "command": ["python", "mcp_servers/db_multi_mcp.py"],
+      "enabled": true
+    },
+    "ctz-i18n": {
+      "type": "local",
+      "command": ["python", "mcp_servers/i18n_mcp.py"],
+      "enabled": true
+    },
+    "ctz-plugin": {
+      "type": "local",
+      "command": ["python", "mcp_servers/plugin_mcp.py"],
+      "enabled": true
+    },
+    "ctz-image-gen": {
+      "type": "local",
+      "command": ["python", "mcp_servers/image_gen_mcp.py"],
+      "enabled": true
+    },
+    "ctz-knowledge-graph": {
+      "type": "local",
+      "command": ["python", "mcp_servers/knowledge_graph_mcp.py"],
       "enabled": true
     }
   },

@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  ctz:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ctz-core-dev
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "5678:5678"
+    volumes:
+      - ..:/app
+      - ctz-data-dev:/app/data
+    environment:
+      - CTZ_ENV=development
+      - CTZ_LOG_LEVEL=DEBUG
+      - PYTHONDONTWRITEBYTECODE=1
+    networks:
+      - ctz-net-dev
+    command: ["python", "-m", "watchdog", "--help"]  # override with hot reload
+
+  ctz-dashboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ctz-dashboard-dev
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+      - "5679:5678"
+    volumes:
+      - ..:/app
+      - ctz-data-dev:/app/data
+    environment:
+      - CTZ_ENV=development
+      - CTZ_DASHBOARD_PORT=8081
+      - PYTHONDONTWRITEBYTECODE=1
+    networks:
+      - ctz-net-dev
+    depends_on:
+      - ctz
+
+  ctz-mobile-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ctz-mobile-api-dev
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    volumes:
+      - ..:/app
+      - ctz-data-dev:/app/data
+    environment:
+      - CTZ_ENV=development
+      - CTZ_MOBILE_PORT=8082
+      - PYTHONDONTWRITEBYTECODE=1
+    networks:
+      - ctz-net-dev
+    depends_on:
+      - ctz
+
+volumes:
+  ctz-data-dev:
+    driver: local
+
+networks:
+  ctz-net-dev:
+    driver: bridge

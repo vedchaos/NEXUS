@@ -15,3 +15,5 @@ from .memory_healer import get_healer
 from .vault import get_vault
 from .heuristics import get_heuristics
 from .meta_reasoner import get_meta_reasoner
+from .neural import get_neural
+from .voice_enhanced import get_voice_enhanced

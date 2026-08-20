@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  ctz:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ctz-core
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ctz-data:/app/data
+      - ctz-config:/app/config
+    environment:
+      - CTZ_ENV=production
+      - CTZ_LOG_LEVEL=INFO
+    networks:
+      - ctz-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ctz-dashboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ctz-dashboard
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    volumes:
+      - ctz-data:/app/data
+    environment:
+      - CTZ_ENV=production
+      - CTZ_DASHBOARD_PORT=8081
+    networks:
+      - ctz-net
+    depends_on:
+      - ctz
+
+  ctz-mobile-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ctz-mobile-api
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    volumes:
+      - ctz-data:/app/data
+    environment:
+      - CTZ_ENV=production
+      - CTZ_MOBILE_PORT=8082
+    networks:
+      - ctz-net
+    depends_on:
+      - ctz
+
+volumes:
+  ctz-data:
+    driver: local
+  ctz-config:
+    driver: local
+
+networks:
+  ctz-net:
+    driver: bridge

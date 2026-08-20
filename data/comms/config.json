@@ -1,0 +1,20 @@
+{
+  "smtp": {
+    "host": "",
+    "port": 587,
+    "user": "",
+    "pass": "",
+    "tls": true,
+    "from": ""
+  },
+  "imap": {
+    "host": "",
+    "port": 993,
+    "user": "",
+    "pass": "",
+    "ssl": true
+  },
+  "slack_webhook": "",
+  "discord_webhook": "",
+  "telegram_token": ""
+}
