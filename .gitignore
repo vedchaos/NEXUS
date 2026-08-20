@@ -1,4 +1,4 @@
-# === NEXUS .gitignore ===
+# === CHAOS TYPE ZERO .gitignore ===
 
 # Environment & Secrets
 config/.env
@@ -21,6 +21,9 @@ data/cache/
 data/memory/
 data/logs/
 data/scan_results/
+data/automation/
+data/context/chromadb/
+data/vault/
 *.db
 *.sqlite
 
@@ -47,4 +50,4 @@ package-lock.json
 *.tmp
 *.temp
 *.bak
-data/automation/
+_count.py

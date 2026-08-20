@@ -10,3 +10,6 @@ from .vision import get_vision
 from .ml_pipeline import get_ml_pipeline
 from .automation import get_engine
 from .context_bridge import get_bridge
+from .cache import get_cache
+from .memory_healer import get_healer
+from .vault import get_vault
