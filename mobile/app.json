@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "CHAOS TYPE ZERO",
+    "slug": "chaos-type-zero",
+    "version": "3.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0a0a0a"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vedchaos.ctz"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0a0a0a"
+      },
+      "package": "com.vedchaos.ctz"
+    }
+  }
+}
