@@ -18,7 +18,7 @@ print(f"[OK] Started session: {sid}")
 
 # Save context entries
 bridge.save_context(sid, "decision", "Decided to use ChromaDB for semantic search in context bridge", importance=0.8)
-bridge.save_context(sid, "fact", "CTZ has 14 LLM providers - more than MAST's 11", importance=0.7)
+bridge.save_context(sid, "fact", "CTZ has 14 LLM providers", importance=0.7)
 bridge.save_context(sid, "preference", "User prefers Hinglish communication style", importance=0.9)
 bridge.save_context(sid, "task_outcome", "Context bridge module created and tested successfully", importance=0.6)
 print("[OK] Saved 4 context entries")
