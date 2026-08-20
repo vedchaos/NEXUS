@@ -5,7 +5,7 @@ import json, subprocess, sys
 TOOLS = [
     {"name": "ctz_git_status", "description": "Get git status of a repo", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}}}},
     {"name": "ctz_git_log", "description": "Get recent git commits", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "count": {"type": "integer", "default": 10}}}},
-    {"name": "ctz_git_diff", "description": "Get git diff", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "staged": {"type": "boolean", "default": false}}}},
+    {"name": "ctz_git_diff", "description": "Get git diff", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "staged": {"type": "boolean", "default": False}}}},
     {"name": "ctz_git_commit", "description": "Stage all and commit", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "message": {"type": "string"}}, "required": ["message"]}},
     {"name": "ctz_git_push", "description": "Push to remote", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "remote": {"type": "string", "default": "origin"}, "branch": {"type": "string", "default": "main"}}}},
     {"name": "ctz_git_pull", "description": "Pull from remote", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "remote": {"type": "string", "default": "origin"}}}},

@@ -8,8 +8,8 @@ except ImportError:
 
 TOOLS = [
     {"name": "ctz_api_get", "description": "GET request to an API endpoint", "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}, "headers": {"type": "object", "default": {}}, "timeout": {"type": "integer", "default": 30}}, "required": ["url"]}},
-    {"name": "ctz_api_post", "description": "POST request to an API endpoint", "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}, "data": {"type": "object", "default": {}}, "headers": {"type": "object", "default": {}}, "json_body": {"type": "boolean", "default": true}}, "required": ["url"]}},
-    {"name": "ctz_api_put", "description": "PUT request to an API endpoint", "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}, "data": {"type": "object", "default": {}}, "headers": {"type": "object", "default": {}}, "json_body": {"type": "boolean", "default": true}}, "required": ["url"]}},
+    {"name": "ctz_api_post", "description": "POST request to an API endpoint", "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}, "data": {"type": "object", "default": {}}, "headers": {"type": "object", "default": {}}, "json_body": {"type": "boolean", "default": True}}, "required": ["url"]}},
+    {"name": "ctz_api_put", "description": "PUT request to an API endpoint", "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}, "data": {"type": "object", "default": {}}, "headers": {"type": "object", "default": {}}, "json_body": {"type": "boolean", "default": True}}, "required": ["url"]}},
     {"name": "ctz_api_delete", "description": "DELETE request to an API endpoint", "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}, "headers": {"type": "object", "default": {}}}, "required": ["url"]}},
     {"name": "ctz_api_test", "description": "Test an API endpoint (GET + measure response time)", "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}, "expected_status": {"type": "integer", "default": 200}}, "required": ["url"]}},
 ]

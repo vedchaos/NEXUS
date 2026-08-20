@@ -5,8 +5,8 @@ from pathlib import Path
 
 TOOLS = [
     {"name": "ctz_file_read", "description": "Read a file's contents", "inputSchema": {"type": "object", "properties": {"path": {"type": "string"}, "encoding": {"type": "string", "default": "utf-8"}}, "required": ["path"]}},
-    {"name": "ctz_file_write", "description": "Write content to a file", "inputSchema": {"type": "object", "properties": {"path": {"type": "string"}, "content": {"type": "string"}, "append": {"type": "boolean", "default": false}}, "required": ["path", "content"]}},
-    {"name": "ctz_file_list", "description": "List files in a directory", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "pattern": {"type": "string", "default": "*"}, "recursive": {"type": "boolean", "default": false}}}},
+    {"name": "ctz_file_write", "description": "Write content to a file", "inputSchema": {"type": "object", "properties": {"path": {"type": "string"}, "content": {"type": "string"}, "append": {"type": "boolean", "default": False}}, "required": ["path", "content"]}},
+    {"name": "ctz_file_list", "description": "List files in a directory", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "pattern": {"type": "string", "default": "*"}, "recursive": {"type": "boolean", "default": False}}}},
     {"name": "ctz_file_search", "description": "Search for files by name pattern", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "pattern": {"type": "string"}, "max_results": {"type": "integer", "default": 50}}, "required": ["pattern"]}},
     {"name": "ctz_file_grep", "description": "Search file contents by regex pattern", "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "default": "."}, "pattern": {"type": "string"}, "include": {"type": "string", "default": "*"}, "max_results": {"type": "integer", "default": 50}}, "required": ["pattern"]}},
     {"name": "ctz_file_info", "description": "Get file info (size, modified, type)", "inputSchema": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}},

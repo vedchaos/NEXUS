@@ -12,14 +12,15 @@ TOOLS = [
 ]
 
 # Simple word-level dictionaries for demo/basic use
-DICTS = {
+_FORWARD_DICTS = {
     ("en", "es"): {"hello": "hola", "world": "mundo", "good": "bueno", "morning": "mañana", "night": "noche", "thank": "gracias", "you": "tú", "please": "por favor", "yes": "sí", "no": "no", "water": "agua", "food": "comida", "time": "tiempo", "day": "día", "friend": "amigo"},
     ("en", "fr"): {"hello": "bonjour", "world": "monde", "good": "bon", "morning": "matin", "night": "nuit", "thank": "merci", "you": "vous", "please": "s'il vous plaît", "yes": "oui", "no": "non", "water": "eau", "food": "nourriture", "time": "temps", "day": "jour", "friend": "ami"},
     ("en", "de"): {"hello": "hallo", "world": "welt", "good": "gut", "morning": "morgen", "night": "nacht", "thank": "danke", "you": "du", "please": "bitte", "yes": "ja", "no": "nein", "water": "wasser", "food": "essen", "time": "zeit", "day": "tag", "friend": "freund"},
-    ("es", "en"): {v: k for k, v in DICTS.get(("en", "es"), {}).items()},
-    ("fr", "en"): {v: k for k, v in DICTS.get(("en", "fr"), {}).items()},
-    ("de", "en"): {v: k for k, v in DICTS.get(("en", "de"), {}).items()},
 }
+DICTS = dict(_FORWARD_DICTS)
+for key, fwd in _FORWARD_DICTS.items():
+    reverse_key = (key[1], key[0])
+    DICTS[reverse_key] = {v: k for k, v in fwd.items()}
 
 # Common word frequency per language for detection
 LANG_PATTERNS = {
