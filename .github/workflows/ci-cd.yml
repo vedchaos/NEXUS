@@ -113,13 +113,13 @@ jobs:
           echo "✅ Syntax check complete"
 
   # ============================================================
-  # DOCKER BUILD
+  # DOCKER BUILD (skip if no Docker Hub secrets)
   # ============================================================
   docker:
     name: Docker Build
     runs-on: ubuntu-latest
     needs: [test-unit, test-mcp, syntax]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.DOCKERHUB_USERNAME != ''
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -146,13 +146,13 @@ jobs:
           cache-to: type=gha,mode=max
 
   # ============================================================
-  # DEPLOY TO STAGING
+  # DEPLOY TO STAGING (skip if no Docker or no SSH secrets)
   # ============================================================
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: [docker]
-    if: github.ref == 'refs/heads/main'
+    if: always() && needs.docker.result == 'success' && vars.STAGING_HOST != ''
     environment: staging
     steps:
       - name: Checkout
@@ -199,13 +199,13 @@ jobs:
           echo "✅ Security scan complete"
 
   # ============================================================
-  # RELEASE
+  # RELEASE (only on release: commit message)
   # ============================================================
   release:
     name: Create Release
     runs-on: ubuntu-latest
-    needs: [docker, deploy-staging]
-    if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release:')
+    needs: [test-unit, test-mcp, syntax]
+    if: always() && needs.test-unit.result == 'success' && needs.test-mcp.result == 'success' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release:')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -213,7 +213,7 @@ jobs:
       - name: Extract Version
         id: version
         run: |
-          VERSION=$(grep -oP '"version":\s*"\K[^"]+' opencode.json || echo "3.2")
+          VERSION=$(grep -oP '"version":\s*"\K[^"]+' opencode.json || echo "3.3")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
