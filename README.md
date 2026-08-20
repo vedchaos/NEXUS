@@ -31,7 +31,7 @@ CHAOS TYPE ZERO (CTZ) is a personal AI agent that thinks, remembers, automates, 
 
 ```bash
 # Clone
-git clone https://github.com/vedchaos/NEXUS.git
+git clone https://github.com/vedchaos/chaos-type-zero.git
 cd NEXUS
 
 # Install dependencies
