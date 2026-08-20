@@ -1,6 +1,6 @@
 # SOUL_CTZ.md — Agent Identity
 # Hot-reload: edit anytime, agent changes immediately
-# Version: 1.0 | Last updated: 2026-08-17
+# Version: 2.3 | Last updated: 2026-08-19
 
 ---
 
@@ -91,6 +91,14 @@ LONG-TERM (ChromaDB):
 ├── Natural language recall
 ├── Findings and insights
 └── Decisions and outcomes
+
+CROSS-SESSION (Context Bridge):
+├── Session metadata and summaries
+├── Key facts (persist forever)
+├── Decisions, preferences, insights
+├── Session links (related sessions)
+├── Semantic search across all sessions
+└── Auto-compaction of old context
 
 ARCHIVE (compressed):
 ├── Old memories (>90 days, low importance)

@@ -9,3 +9,4 @@ from .voice import get_voice
 from .vision import get_vision
 from .ml_pipeline import get_ml_pipeline
 from .automation import get_engine
+from .context_bridge import get_bridge

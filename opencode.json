@@ -93,6 +93,11 @@
       "type": "local",
       "command": ["python", "mcp_servers/automation_mcp.py"],
       "enabled": true
+    },
+    "ctz-context-bridge": {
+      "type": "local",
+      "command": ["python", "mcp_servers/context_bridge_mcp.py"],
+      "enabled": true
     }
   },
 
