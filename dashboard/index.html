@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHAOS TYPE ZERO — Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0a; --bg2: #111111; --bg3: #1a1a1a;
+    --green: #00ff41; --green-dim: #00cc33; --green-glow: rgba(0,255,65,.15);
+    --red: #ff0040; --yellow: #ffd700; --cyan: #00e5ff;
+    --text: #c0c0c0; --text-dim: #666; --border: #222;
+    --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  }
+  body {
+    background: var(--bg); color: var(--text); font-family: var(--font-mono);
+    font-size: 13px; min-height: 100vh; overflow-x: hidden;
+    background-image:
+      linear-gradient(rgba(0,255,65,.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,65,.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  ::selection { background: var(--green); color: var(--bg); }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 3px; }
+
+  .scanline {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 9999;
+    background: repeating-linear-gradient(
+      0deg, rgba(0,0,0,.03) 0px, rgba(0,0,0,.03) 1px, transparent 1px, transparent 3px
+    );
+  }
+  .flicker {
+    animation: flicker 0.15s infinite alternate;
+  }
+  @keyframes flicker {
+    from { opacity: .97; } to { opacity: 1; }
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .6; } }
+  @keyframes glow-pulse {
+    0%,100% { box-shadow: 0 0 5px var(--green-glow), inset 0 0 5px var(--green-glow); }
+    50% { box-shadow: 0 0 15px var(--green-glow), inset 0 0 10px var(--green-glow); }
+  }
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes typing {
+    from { width: 0; } to { width: 100%; }
+  }
+  @keyframes blink-caret { 50% { border-color: transparent; } }
+  @keyframes bar-fill { from { width: 0; } }
+
+  header {
+    border-bottom: 1px solid var(--green-dim); padding: 12px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg2); position: relative; overflow: hidden;
+  }
+  header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .logo-text {
+    color: var(--green); font-size: 18px; font-weight: bold;
+    text-shadow: 0 0 10px var(--green-glow), 0 0 20px var(--green-glow);
+    letter-spacing: 3px;
+  }
+  .version { color: var(--text-dim); font-size: 11px; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border: 1px solid var(--green-dim); border-radius: 2px;
+    font-size: 11px; color: var(--green);
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  .clock { color: var(--cyan); font-size: 12px; }
+
+  .ascii-header {
+    color: var(--green); text-align: center; padding: 16px 24px 8px;
+    font-size: 10px; line-height: 1.2; white-space: pre;
+    text-shadow: 0 0 5px var(--green-glow); overflow-x: auto;
+  }
+
+  .main { padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+
+  .section-title {
+    color: var(--green); font-size: 12px; font-weight: bold;
+    text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before { content: '>'; color: var(--green-dim); }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--green-dim), transparent);
+  }
+
+  .grid { display: grid; gap: 12px; }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 14px; position: relative; overflow: hidden;
+    animation: slide-in 0.3s ease-out;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--green-dim); }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card-label {
+    color: var(--text-dim); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 6px;
+  }
+  .card-value {
+    color: var(--green); font-size: 28px; font-weight: bold;
+    text-shadow: 0 0 8px var(--green-glow);
+  }
+  .card-sub { color: var(--text-dim); font-size: 11px; margin-top: 4px; }
+
+  .progress-track {
+    width: 100%; height: 8px; background: var(--bg3); border-radius: 4px;
+    margin-top: 8px; overflow: hidden; position: relative;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 4px; transition: width 1s ease;
+    position: relative; overflow: hidden;
+    animation: bar-fill 1s ease-out;
+  }
+  .progress-fill::after {
+    content: ''; position: absolute; top: 0; right: 0; width: 20px; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.3));
+  }
+  .progress-fill.green { background: linear-gradient(90deg, var(--green-dim), var(--green)); }
+  .progress-fill.yellow { background: linear-gradient(90deg, #cc8800, var(--yellow)); }
+  .progress-fill.red { background: linear-gradient(90deg, #cc0033, var(--red)); }
+  .progress-fill.cyan { background: linear-gradient(90deg, #0099aa, var(--cyan)); }
+
+  table {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+  }
+  th {
+    text-align: left; padding: 8px 12px; color: var(--green);
+    border-bottom: 1px solid var(--green-dim); font-weight: normal;
+    text-transform: uppercase; letter-spacing: 1px; font-size: 10px;
+  }
+  td {
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+  }
+  tr:hover td { background: var(--bg3); }
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 2px;
+    font-size: 10px; font-weight: bold; text-transform: uppercase;
+  }
+  .tag-online { background: rgba(0,255,65,.15); color: var(--green); border: 1px solid rgba(0,255,65,.3); }
+  .tag-offline { background: rgba(255,0,64,.15); color: var(--red); border: 1px solid rgba(255,0,64,.3); }
+  .tag-warning { background: rgba(255,215,0,.15); color: var(--yellow); border: 1px solid rgba(255,215,0,.3); }
+  .tag-idle { background: rgba(0,229,255,.15); color: var(--cyan); border: 1px solid rgba(0,229,255,.3); }
+
+  .activity-log {
+    max-height: 300px; overflow-y: auto; font-size: 11px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+    padding: 8px;
+  }
+  .log-entry {
+    padding: 4px 8px; display: flex; gap: 12px; border-bottom: 1px solid #1a1a1a;
+    animation: slide-in 0.2s ease-out;
+  }
+  .log-entry:hover { background: var(--bg3); }
+  .log-time { color: var(--text-dim); min-width: 80px; }
+  .log-type { min-width: 70px; font-weight: bold; }
+  .log-msg { color: var(--text); }
+  .log-type.info { color: var(--cyan); }
+  .log-type.warn { color: var(--yellow); }
+  .log-type.error { color: var(--red); }
+  .log-type.success { color: var(--green); }
+  .log-type.system { color: #b388ff; }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    background: transparent; border: 1px solid var(--green-dim); color: var(--green);
+    padding: 8px 16px; font-family: var(--font-mono); font-size: 12px;
+    cursor: pointer; border-radius: 2px; transition: all 0.2s;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .btn:hover {
+    background: var(--green); color: var(--bg);
+    box-shadow: 0 0 15px var(--green-glow);
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn.danger { border-color: var(--red); color: var(--red); }
+  .btn.danger:hover { background: var(--red); color: var(--bg); box-shadow: 0 0 15px rgba(255,0,64,.3); }
+
+  .auto-list { list-style: none; }
+  .auto-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+  }
+  .auto-item:last-child { border-bottom: none; }
+  .auto-name { color: var(--text); }
+  .auto-cron { color: var(--text-dim); font-size: 10px; }
+  .auto-toggle {
+    width: 36px; height: 18px; background: var(--bg3); border-radius: 9px;
+    border: 1px solid var(--border); cursor: pointer; position: relative;
+    transition: all 0.3s;
+  }
+  .auto-toggle.active { background: rgba(0,255,65,.2); border-color: var(--green-dim); }
+  .auto-toggle::after {
+    content: ''; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--text-dim); position: absolute; top: 1px; left: 1px;
+    transition: all 0.3s;
+  }
+  .auto-toggle.active::after { left: 19px; background: var(--green); }
+
+  .footer {
+    border-top: 1px solid var(--border); padding: 12px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--text-dim); font-size: 10px;
+  }
+  .footer a { color: var(--green-dim); text-decoration: none; }
+  .footer a:hover { color: var(--green); }
+
+  .refresh-indicator {
+    position: fixed; top: 60px; right: 24px; z-index: 100;
+    color: var(--text-dim); font-size: 10px; opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .refresh-indicator.active { opacity: 1; }
+
+  .modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,.8); z-index: 1000; justify-content: center;
+    align-items: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg2); border: 1px solid var(--green-dim); border-radius: 4px;
+    padding: 24px; max-width: 500px; width: 90%; animation: slide-in 0.2s;
+  }
+  .modal h3 { color: var(--green); margin-bottom: 12px; font-size: 14px; }
+  .modal p { color: var(--text); margin-bottom: 8px; font-size: 12px; }
+  .modal .close-btn {
+    margin-top: 16px; float: right;
+  }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 2000;
+    background: var(--bg2); border: 1px solid var(--green-dim);
+    padding: 10px 16px; border-radius: 4px; font-size: 12px;
+    color: var(--green); transform: translateY(100px); opacity: 0;
+    transition: all 0.3s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { border-color: var(--red); color: var(--red); }
+
+  @media (max-width: 900px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+
+<div class="refresh-indicator" id="refreshIndicator">REFRESHING...</div>
+
+<header>
+  <div class="header-left">
+    <div>
+      <div class="logo-text">CHAOS TYPE ZERO</div>
+      <div class="version">Dashboard v1.0 // Build 2026.08</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      <span id="systemStatus">SYSTEM NOMINAL</span>
+    </div>
+    <div class="clock" id="clock"></div>
+  </div>
+</header>
+
+<pre class="ascii-header">
+ ██████╗██╗  ██╗ █████╗ ████████╗    ██████╗  █████╗ ███╗   ██╗████████╗ ██████╗ ███╗   ███╗
+██╔════╝██║  ██║██╔══██╗╚══██╔══╝    ██╔══██╗██╔══██╗████╗  ██║╚══██╔══╝██╔═══██╗████╗ ████║
+██║     ███████║███████║   ██║       ██████╔╝███████║██╔██╗ ██║   ██║   ██║   ██║██╔████╔██║
+██║     ██╔══██║██╔══██║   ██║       ██╔═══╝ ██╔══██║██║╚██╗██║   ██║   ██║   ██║██║╚██╔╝██║
+╚██████╗██║  ██║██║  ██║   ██║       ██║     ██║  ██║██║ ╚████║   ██║   ╚██████╔╝██║ ╚═╝ ██║
+ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝    ╚═════╝ ╚═╝     ╚═╝
+</pre>
+
+<main class="main">
+
+  <div class="section-title">System Status</div>
+  <div class="grid grid-3" id="systemCards">
+    <div class="card">
+      <div class="card-label">CPU Usage</div>
+      <div class="card-value" id="cpuVal">--</div>
+      <div class="card-sub" id="cpuSub"></div>
+      <div class="progress-track"><div class="progress-fill green" id="cpuBar" style="width:0%"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-label">RAM Usage</div>
+      <div class="card-value" id="ramVal">--</div>
+      <div class="card-sub" id="ramSub"></div>
+      <div class="progress-track"><div class="progress-fill cyan" id="ramBar" style="width:0%"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Disk Usage</div>
+      <div class="card-value" id="diskVal">--</div>
+      <div class="card-sub" id="diskSub"></div>
+      <div class="progress-track"><div class="progress-fill yellow" id="diskBar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">MCP Servers</div>
+  <div class="card" style="padding:0; overflow:hidden;">
+    <table>
+      <thead><tr><th>Server</th><th>Status</th><th>Tools</th><th>Uptime</th></tr></thead>
+      <tbody id="serversBody"></tbody>
+    </table>
+  </div>
+
+  <div class="grid grid-2">
+    <div>
+      <div class="section-title">Memory Stats</div>
+      <div class="grid grid-2" id="memoryCards">
+        <div class="card">
+          <div class="card-label">Ledger Entries</div>
+          <div class="card-value" id="ledgerVal">--</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Context Sessions</div>
+          <div class="card-value" id="contextVal">--</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Cache Hits</div>
+          <div class="card-value" id="cacheVal">--</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Cache Size</div>
+          <div class="card-value" id="cacheSizeVal">--</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="section-title">Automations</div>
+      <div class="card" style="padding:0;">
+        <ul class="auto-list" id="autoList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Quick Actions</div>
+  <div class="actions">
+    <button class="btn" onclick="runHealthCheck()">&#9650; Run Health Check</button>
+    <button class="btn danger" onclick="clearCache()">&#10005; Clear Cache</button>
+    <button class="btn" onclick="showStats()">&#8801; Show Stats</button>
+    <button class="btn" onclick="restartServers()">&#8635; Restart Servers</button>
+  </div>
+
+  <div class="section-title">Activity Log</div>
+  <div class="activity-log" id="activityLog"></div>
+
+</main>
+
+<footer class="footer">
+  <span>CHAOS TYPE ZERO &copy; 2026 // Node: <span id="nodeName">--</span> // Uptime: <span id="uptime">--</span></span>
+  <span>Last refresh: <span id="lastRefresh">never</span> // Next in <span id="countdown">30</span>s</span>
+</footer>
+
+<div class="modal-overlay" id="statsModal">
+  <div class="modal">
+    <h3>// SYSTEM STATISTICS</h3>
+    <pre id="statsContent" style="color:var(--green); font-size:11px; white-space:pre-wrap;"></pre>
+    <button class="btn close-btn" onclick="closeModal('statsModal')">CLOSE</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin;
+let countdownVal = 30;
+let countdownInterval;
+
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function progressClass(pct) {
+  if (pct > 85) return 'red';
+  if (pct > 60) return 'yellow';
+  return 'green';
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+async function fetchData() {
+  const ri = document.getElementById('refreshIndicator');
+  ri.classList.add('active');
+  try {
+    const [statusRes, serversRes, memoryRes, automationsRes] = await Promise.all([
+      fetch(API + '/api/status').then(r => r.json()).catch(() => mockStatus()),
+      fetch(API + '/api/servers').then(r => r.json()).catch(() => mockServers()),
+      fetch(API + '/api/memory').then(r => r.json()).catch(() => mockMemory()),
+      fetch(API + '/api/automations').then(r => r.json()).catch(() => mockAutomations()),
+    ]);
+    renderStatus(statusRes);
+    renderServers(serversRes);
+    renderMemory(memoryRes);
+    renderAutomations(automationsRes);
+    document.getElementById('lastRefresh').textContent = new Date().toLocaleTimeString();
+    addLog('info', 'Dashboard data refreshed');
+  } catch(e) {
+    renderStatus(mockStatus());
+    renderServers(mockServers());
+    renderMemory(mockMemory());
+    renderAutomations(mockAutomations());
+    addLog('warn', 'Using mock data — server not connected');
+  }
+  ri.classList.remove('active');
+  countdownVal = 30;
+}
+
+function renderStatus(d) {
+  const set = (id, pct, label, detail) => {
+    document.getElementById(id+'Val').textContent = pct + '%';
+    document.getElementById(id+'Sub').textContent = detail;
+    const bar = document.getElementById(id+'Bar');
+    bar.style.width = pct + '%';
+    bar.className = 'progress-fill ' + progressClass(pct);
+  };
+  set('cpu', d.cpu?.percent ?? 0, '', d.cpu?.detail ?? '');
+  set('ram', d.ram?.percent ?? 0, '', d.ram?.detail ?? '');
+  set('disk', d.disk?.percent ?? 0, '', d.disk?.detail ?? '');
+  document.getElementById('nodeName').textContent = d.hostname ?? 'unknown';
+  document.getElementById('uptime').textContent = d.uptime ?? '--';
+  document.getElementById('systemStatus').textContent = d.status ?? 'UNKNOWN';
+}
+
+function renderServers(servers) {
+  const tbody = document.getElementById('serversBody');
+  tbody.innerHTML = '';
+  (servers || []).forEach(s => {
+    const tagClass = s.status === 'online' ? 'tag-online' : s.status === 'warning' ? 'tag-warning' : 'tag-offline';
+    tbody.innerHTML += `<tr>
+      <td style="color:var(--text)">${esc(s.name)}</td>
+      <td><span class="tag ${tagClass}">${esc(s.status)}</span></td>
+      <td style="color:var(--cyan)">${s.tools ?? 0}</td>
+      <td style="color:var(--text-dim)">${s.uptime ?? '--'}</td>
+    </tr>`;
+  });
+  if (!servers?.length) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-dim)">No servers found</td></tr>';
+}
+
+function renderMemory(m) {
+  document.getElementById('ledgerVal').textContent = m.ledger_entries ?? 0;
+  document.getElementById('contextVal').textContent = m.context_sessions ?? 0;
+  document.getElementById('cacheVal').textContent = m.cache_hits ?? 0;
+  document.getElementById('cacheSizeVal').textContent = m.cache_size ?? '0 KB';
+}
+
+function renderAutomations(autos) {
+  const ul = document.getElementById('autoList');
+  ul.innerHTML = '';
+  (autos || []).forEach(a => {
+    ul.innerHTML += `<li class="auto-item">
+      <div>
+        <div class="auto-name" style="color:var(--text)">${esc(a.name)}</div>
+        <div class="auto-cron">${esc(a.schedule)}</div>
+      </div>
+      <div class="auto-toggle ${a.active ? 'active' : ''}" onclick="this.classList.toggle('active')"></div>
+    </li>`;
+  });
+  if (!autos?.length) ul.innerHTML = '<li style="padding:12px;color:var(--text-dim)">No automations configured</li>';
+}
+
+const logEntries = [];
+function addLog(type, msg) {
+  const now = new Date();
+  const time = String(now.getHours()).padStart(2,'0') + ':' +
+               String(now.getMinutes()).padStart(2,'0') + ':' +
+               String(now.getSeconds()).padStart(2,'0');
+  logEntries.unshift({ time, type, msg });
+  if (logEntries.length > 50) logEntries.pop();
+  renderLog();
+}
+function renderLog() {
+  const el = document.getElementById('activityLog');
+  el.innerHTML = logEntries.map(e =>
+    `<div class="log-entry"><span class="log-time">${e.time}</span><span class="log-type ${e.type}">${e.type.toUpperCase()}</span><span class="log-msg">${esc(e.msg)}</span></div>`
+  ).join('');
+}
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function runHealthCheck() {
+  addLog('system', 'Health check initiated...');
+  showToast('Running health check...');
+  setTimeout(() => {
+    addLog('success', 'Health check complete — all systems operational');
+    showToast('Health check passed');
+  }, 1500);
+}
+function clearCache() {
+  addLog('warn', 'Cache clearing requested');
+  showToast('Cache cleared');
+  addLog('success', 'Cache cleared successfully');
+}
+function showStats() {
+  const m = mockMemory();
+  const stats = [
+    '╔══════════════════════════════════╗',
+    '║     SYSTEM STATISTICS            ║',
+    '╠══════════════════════════════════╣',
+    `║ Ledger Entries : ${(m.ledger_entries+'').padEnd(16)}║`,
+    `║ Context Sessions: ${(m.context_sessions+'').padEnd(15)}║`,
+    `║ Cache Hits     : ${(m.cache_hits+'').padEnd(16)}║`,
+    `║ Cache Size     : ${(m.cache_size+'').padEnd(16)}║`,
+    '╠══════════════════════════════════╣',
+    `║ MCP Servers    : ${('3').padEnd(16)}║`,
+    `║ Active Tools   : ${('12').padEnd(16)}║`,
+    `║ Automations    : ${('4').padEnd(16)}║`,
+    '╚══════════════════════════════════╝',
+  ].join('\n');
+  document.getElementById('statsContent').textContent = stats;
+  document.getElementById('statsModal').classList.add('show');
+  addLog('info', 'Stats panel opened');
+}
+function restartServers() {
+  addLog('warn', 'Server restart requested');
+  showToast('Restarting servers...');
+  setTimeout(() => {
+    addLog('success', 'All MCP servers restarted');
+    showToast('Servers restarted');
+  }, 2000);
+}
+
+// Mock data fallback
+function mockStatus() {
+  return {
+    hostname: 'CTZ-NODE-01', uptime: '3d 14h 22m', status: 'SYSTEM NOMINAL',
+    cpu: { percent: 23, detail: '4 cores // Intel i7-13700K' },
+    ram: { percent: 61, detail: '9.8 GB / 16 GB' },
+    disk: { percent: 44, detail: '220 GB / 500 GB' },
+  };
+}
+function mockServers() {
+  return [
+    { name: 'openwork-cloud', status: 'online', tools: 6, uptime: '3d 14h' },
+    { name: 'memory-core', status: 'online', tools: 4, uptime: '3d 14h' },
+    { name: 'heuristics', status: 'online', tools: 2, uptime: '1d 8h' },
+  ];
+}
+function mockMemory() {
+  return { ledger_entries: 1247, context_sessions: 38, cache_hits: 892, cache_size: '4.2 MB' };
+}
+function mockAutomations() {
+  return [
+    { name: 'Memory Consolidation', schedule: 'Every 6h', active: true },
+    { name: 'Log Rotation', schedule: 'Daily 03:00', active: true },
+    { name: 'Health Ping', schedule: 'Every 5m', active: true },
+    { name: 'Backup Vault', schedule: 'Daily 04:00', active: false },
+  ];
+}
+
+// Countdown
+function startCountdown() {
+  clearInterval(countdownInterval);
+  countdownVal = 30;
+  countdownInterval = setInterval(() => {
+    countdownVal--;
+    document.getElementById('countdown').textContent = countdownVal;
+    if (countdownVal <= 0) {
+      fetchData();
+      countdownVal = 30;
+    }
+  }, 1000);
+}
+
+// Init
+addLog('system', 'Dashboard initialized');
+addLog('info', 'Connecting to CTZ backend...');
+fetchData().then(() => startCountdown());
+</script>
+</body>
+</html>

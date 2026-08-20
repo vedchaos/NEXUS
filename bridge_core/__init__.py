@@ -13,3 +13,5 @@ from .context_bridge import get_bridge
 from .cache import get_cache
 from .memory_healer import get_healer
 from .vault import get_vault
+from .heuristics import get_heuristics
+from .meta_reasoner import get_meta_reasoner
