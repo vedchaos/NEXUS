@@ -1,7 +1,9 @@
 # ============================================================
-# CHAOS TYPE ZERO — Terraform Main (AWS)
+# CHAOS TYPE ZERO — Terraform Main (AWS EC2 Free Tier)
 # ============================================================
-# Deploy CTZ on AWS EC2 with VPC, Security Group, and Storage
+# Deploy CTZ v3.3 on AWS EC2 t3.micro (FREE for 12 months)
+# Includes: VPC, Security Group, EBS, S3, CloudWatch
+# ============================================================
 
 terraform {
   required_version = ">= 1.0"
@@ -13,11 +15,8 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket = "ctz-terraform-state"
-    key    = "chaos-type-zero/terraform.tfstate"
-    region = "us-east-1"
-  }
+  # Local backend — no S3 bucket needed for first deploy
+  backend "local" {}
 }
 
 provider "aws" {
@@ -45,6 +44,9 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 }
+
+# Current AWS caller identity
+data "aws_caller_identity" "current" {}
 
 # ============================================================
 # VPC
@@ -101,7 +103,7 @@ resource "aws_route_table_association" "ctz_public" {
 # ============================================================
 resource "aws_security_group" "ctz_sg" {
   name        = "${var.project_name}-sg"
-  description = "CTZ Security Group"
+  description = "CTZ Security Group — SSH + all CTZ ports"
   vpc_id      = aws_vpc.ctz_vpc.id
 
   # SSH
@@ -110,6 +112,16 @@ resource "aws_security_group" "ctz_sg" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = var.allowed_cidr_blocks
+    description = "SSH access"
+  }
+
+  # FastAPI Production Server
+  ingress {
+    from_port   = 9000
+    to_port     = 9000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "CTZ FastAPI production server"
   }
 
   # Dashboard
@@ -118,22 +130,16 @@ resource "aws_security_group" "ctz_sg" {
     to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "CTZ Dashboard"
   }
 
-  # API
+  # Mobile API
   ingress {
     from_port   = 8081
     to_port     = 8081
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Prometheus
-  ingress {
-    from_port   = 9090
-    to_port     = 9090
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "CTZ Mobile API"
   }
 
   # Slack Bot
@@ -142,6 +148,7 @@ resource "aws_security_group" "ctz_sg" {
     to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Slack Bot"
   }
 
   # Grafana
@@ -150,6 +157,16 @@ resource "aws_security_group" "ctz_sg" {
     to_port     = 3001
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Grafana dashboard"
+  }
+
+  # Prometheus
+  ingress {
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Prometheus metrics"
   }
 
   # All outbound
@@ -158,6 +175,7 @@ resource "aws_security_group" "ctz_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "All outbound traffic"
   }
 
   tags = {
@@ -166,36 +184,61 @@ resource "aws_security_group" "ctz_sg" {
 }
 
 # ============================================================
-# EC2 INSTANCE
+# EC2 INSTANCE (Free Tier: t3.micro — 750 hrs/mo for 12 months)
 # ============================================================
 resource "aws_instance" "ctz_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
-  key_name               = var.key_pair_name
+  key_name               = aws_key_pair.ctz_key.key_name
   vpc_security_group_ids = [aws_security_group.ctz_sg.id]
   subnet_id              = aws_subnet.ctz_public.id
 
   root_block_device {
-    volume_size = 50
+    volume_size = var.root_volume_size
     volume_type = "gp3"
     encrypted   = true
   }
 
   user_data = templatefile("${path.module}/user_data.sh", {
-    db_password = var.db_password
+    project_name = var.project_name
+    github_repo  = var.github_repo
   })
 
   tags = {
-    Name = "${var.project_name}-server"
+    Name    = "${var.project_name}-server"
+    Version = "3.3"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
 # ============================================================
-# EBS VOLUME (Data)
+# SSH KEY PAIR (auto-generated)
+# ============================================================
+resource "tls_private_key" "ctz_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "ctz_key" {
+  key_name   = "${var.project_name}-key"
+  public_key = tls_private_key.ctz_key.public_key_openssh
+}
+
+resource "local_file" "ctz_private_key" {
+  content         = tls_private_key.ctz_key.private_key_pem
+  filename        = "${path.module}/ctz-key.pem"
+  file_permission = "0400"
+}
+
+# ============================================================
+# EBS VOLUME (Data — 20GB free tier gp3)
 # ============================================================
 resource "aws_ebs_volume" "ctz_data" {
   availability_zone = "${var.aws_region}a"
-  size              = 100
+  size              = var.data_volume_size
   type              = "gp3"
   encrypted         = true
 
@@ -211,10 +254,10 @@ resource "aws_volume_attachment" "ctz_data" {
 }
 
 # ============================================================
-# S3 BUCKET (Backups)
+# S3 BUCKET (Backups — 5 GB free)
 # ============================================================
 resource "aws_s3_bucket" "ctz_backups" {
-  bucket = "${var.project_name}-backups-${var.environment}"
+  bucket = "${var.project_name}-backups-${var.environment}-${data.aws_caller_identity.current.account_id}"
 
   tags = {
     Name = "${var.project_name}-backups"
@@ -239,8 +282,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "ctz_backups" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "ctz_backups" {
+  bucket = aws_s3_bucket.ctz_backups.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 # ============================================================
-# CLOUDWATCH
+# CLOUDWATCH ALARMS (Free: 10 alarms)
 # ============================================================
 resource "aws_cloudwatch_metric_alarm" "ctz_cpu" {
   alarm_name          = "${var.project_name}-cpu-high"
@@ -252,7 +304,22 @@ resource "aws_cloudwatch_metric_alarm" "ctz_cpu" {
   statistic           = "Average"
   threshold           = 80
   alarm_description   = "CTZ CPU utilization > 80%"
-  alarm_actions       = []
+
+  dimensions = {
+    InstanceId = aws_instance.ctz_server.id
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "ctz_status_check" {
+  alarm_name          = "${var.project_name}-status-check-failed"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "StatusCheckFailed"
+  namespace           = "AWS/EC2"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 0
+  alarm_description   = "CTZ instance status check failed"
 
   dimensions = {
     InstanceId = aws_instance.ctz_server.id
@@ -262,6 +329,11 @@ resource "aws_cloudwatch_metric_alarm" "ctz_cpu" {
 # ============================================================
 # OUTPUTS
 # ============================================================
+output "instance_id" {
+  description = "EC2 instance ID"
+  value       = aws_instance.ctz_server.id
+}
+
 output "instance_public_ip" {
   description = "CTZ server public IP"
   value       = aws_instance.ctz_server.public_ip
@@ -272,22 +344,47 @@ output "instance_public_dns" {
   value       = aws_instance.ctz_server.public_dns
 }
 
+output "ssh_command" {
+  description = "SSH command to connect"
+  value       = "ssh -i ctz-key.pem ubuntu@${aws_instance.ctz_server.public_ip}"
+}
+
+output "server_url" {
+  description = "CTZ FastAPI production server"
+  value       = "http://${aws_instance.ctz_server.public_ip}:9000"
+}
+
+output "server_swagger" {
+  description = "CTZ Swagger docs"
+  value       = "http://${aws_instance.ctz_server.public_ip}:9000/docs"
+}
+
 output "dashboard_url" {
-  description = "CTZ Dashboard URL"
+  description = "CTZ Dashboard"
   value       = "http://${aws_instance.ctz_server.public_ip}:8080"
 }
 
 output "api_url" {
-  description = "CTZ API URL"
+  description = "CTZ Mobile API"
   value       = "http://${aws_instance.ctz_server.public_ip}:8081"
 }
 
 output "prometheus_url" {
-  description = "Prometheus URL"
+  description = "Prometheus metrics"
   value       = "http://${aws_instance.ctz_server.public_ip}:9090"
+}
+
+output "grafana_url" {
+  description = "Grafana dashboard"
+  value       = "http://${aws_instance.ctz_server.public_ip}:3001"
 }
 
 output "s3_bucket_name" {
   description = "Backup S3 bucket"
   value       = aws_s3_bucket.ctz_backups.id
+}
+
+output "private_key_saved_to" {
+  description = "SSH private key saved to"
+  value       = local_file.ctz_private_key.filename
 }

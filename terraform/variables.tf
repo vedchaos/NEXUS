@@ -32,34 +32,34 @@ variable "public_subnet_cidr" {
   default     = "10.0.1.0/24"
 }
 
-variable "private_subnet_cidr" {
-  description = "Private subnet CIDR"
-  type        = string
-  default     = "10.0.2.0/24"
-}
-
 variable "instance_type" {
-  description = "EC2 instance type"
+  description = "EC2 instance type — t3.micro is free tier eligible (750 hrs/mo for 12 months)"
   type        = string
-  default     = "t3.medium"
+  default     = "t3.micro"
 }
 
-variable "key_pair_name" {
-  description = "AWS key pair name"
-  type        = string
-  default     = "ctz-key"
+variable "root_volume_size" {
+  description = "Root EBS volume size (GB)"
+  type        = number
+  default     = 30
+}
+
+variable "data_volume_size" {
+  description = "Data EBS volume size (GB)"
+  type        = number
+  default     = 20
 }
 
 variable "allowed_cidr_blocks" {
-  description = "Allowed CIDR blocks for SSH"
+  description = "Allowed CIDR blocks for SSH access"
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
 
-variable "db_password" {
-  description = "Database password"
+variable "github_repo" {
+  description = "CTZ GitHub repo to clone"
   type        = string
-  sensitive   = true
+  default     = "https://github.com/vedchaos/chaos-type-zero.git"
 }
 
 variable "tags" {
@@ -68,6 +68,6 @@ variable "tags" {
   default = {
     Project   = "chaos-type-zero"
     ManagedBy = "terraform"
-    Version   = "3.2"
+    Version   = "3.3"
   }
 }

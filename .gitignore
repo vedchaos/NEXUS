@@ -51,3 +51,16 @@ package-lock.json
 *.temp
 *.bak
 _count.py
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/*.tfplan
+terraform/tfplan
+terraform/.terraform.lock.hcl
+terraform/ctz-key.pem
+terraform/*.auto.tfvars
+
+# AWS
+AWS_CONNECTION.md
